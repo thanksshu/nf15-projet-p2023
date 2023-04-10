@@ -11,8 +11,10 @@ int main(void)
     /* stop watchdog  */
     MAP_WDT_A_holdTimer();
 
-    while(1)
+    // test_char_screen();
+
+    while (1)
     {
-        
+
     }
 }

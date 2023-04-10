@@ -17,6 +17,7 @@
 
 /* include user defined */
 #include "config.h"
-#include "screen.h"
+#include "raw_screen.h"
+#include "char_screen.h"
 
 #endif /* INCLUDES_H_ */
