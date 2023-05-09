@@ -11,10 +11,50 @@ int main(void)
     /* stop watchdog  */
     MAP_WDT_A_holdTimer();
 
-    // test_char_screen();
+    /* Initialise screen */
+    RawScreen raw_screen;
+    struct test_struct
+    {
+        bool empty;
+        uint8_t (*array)[5];
+    };
+
+    UnicodeBitmapMapPtr UNICODE_BITMAP_MAP = new_unicode_bitmap_map_ptr();
+    PageBlockRowMap PAGE_BLOCK_LINE_MAP = new_page_block_row_map();
+    CharScreen char_screen = new_char_screen();
+
+    // Test char screen
+    // TODO: RawScreen not finished
+    clear_char_screen(&char_screen);
+    draw_char_screen(&char_screen, &PAGE_BLOCK_LINE_MAP, &UNICODE_BITMAP_MAP,
+                     &raw_screen);
+    printf("------\n");
+
+    set_char_block(&char_screen, 0, 0, 0x0, Left);
+    set_char_block(&char_screen, 0, 1, 0x1, Right);
+    set_char_block(&char_screen, 0, 2, 0x0, Left);
+    set_char_block(&char_screen, 0, 3, 0x1, Left);
+    draw_char_screen(&char_screen, &PAGE_BLOCK_LINE_MAP, &UNICODE_BITMAP_MAP,
+                     &raw_screen);
+    printf("------\n");
+
+    clear_char_screen(&char_screen);
+    draw_char_screen(&char_screen, &PAGE_BLOCK_LINE_MAP, &UNICODE_BITMAP_MAP,
+                     &raw_screen);
+    printf("------\n");
+
+    set_char_block(&char_screen, 2, 0, 0x0, Left);
+    set_char_block(&char_screen, 2, 0, 0x1, Left);
+    set_char_block(&char_screen, 2, 0, 0x0, Left);
+    set_char_block(&char_screen, 2, 1, 0x1, Left);
+    set_char_block(&char_screen, 2, 2, 0x1, Left);
+    set_char_block(&char_screen, 2, 3, 0x1, Right);
+    set_char_block(&char_screen, 2, 4, 0x1, Left);
+    draw_char_screen(&char_screen, &PAGE_BLOCK_LINE_MAP, &UNICODE_BITMAP_MAP,
+                     &raw_screen);
+    printf("------\n");
 
     while (1)
     {
-
     }
 }

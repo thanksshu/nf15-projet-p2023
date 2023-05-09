@@ -3,23 +3,46 @@
 CharScreen new_char_screen()
 {
     CharScreen char_screen;
-    clear_content(&char_screen);
-    _clear_diff(&char_screen);
+    clear_char_screen(&char_screen);
+    _clear_char_screen_diff(&char_screen);
     return char_screen;
 }
 
-void set_block(CharScreen *char_screen, uint8_t x, uint8_t y,
-               uint64_t character)
+void set_char_block(CharScreen *char_screen, uint8_t x, uint8_t y,
+                    Unicode character, Side side)
 {
-    if ((char_screen->_content)[x][y] == character)
+    if ((char_screen->_char_info)[x][y].character == character
+            && (char_screen->_char_info)[x][y].side == side)
     {
-        return;
+        (char_screen->_char_info)[x][y].need_mod = false;
+        (char_screen->_char_info)[x][y].next_side =
+                (char_screen->_char_info)[x][y].side;
+        (char_screen->_char_info)[x][y].next_char =
+                (char_screen->_char_info)[x][y].character;
     }
-    (char_screen->_is_mod)[x][y] = true;
-    (char_screen->_content)[x][y] = character;
+    else
+    {
+        (char_screen->_char_info)[x][y].need_mod = true;
+        (char_screen->_char_info)[x][y].next_side = side;
+        (char_screen->_char_info)[x][y].next_char = character;
+    }
 }
 
-void clear_content(CharScreen *char_screen)
+void clear_char_screen(CharScreen *char_screen)
+{
+    uint8_t char_block_x = 0;
+    uint8_t char_block_y = 0;
+    for (char_block_x = 0; char_block_x < BLOCK_COUNT_X; ++char_block_x)
+    {
+        for (char_block_y = 0; char_block_y < BLOCK_COUNT_Y; ++char_block_y)
+        {
+            set_char_block(char_screen, char_block_x, char_block_y, EMPTY_CHAR,
+            EMPTY_CHAR_SIDE);
+        }
+    }
+}
+
+void _clear_char_screen_diff(CharScreen *char_screen)
 {
     uint8_t x = 0;
     uint8_t y = 0;
@@ -27,124 +50,169 @@ void clear_content(CharScreen *char_screen)
     {
         for (y = 0; y < BLOCK_COUNT_Y; ++y)
         {
-            set_block(char_screen, x, y, EMPTY_CHAR);
+            (char_screen->_char_info)[x][y].need_mod = false;
         }
     }
 }
 
-void _clear_diff(CharScreen *char_screen)
+void draw_char_screen(CharScreen *char_screen,
+                      PageBlockRowMap *page_block_row_map,
+                      UnicodeBitmapMapPtr *unicode_bitmap, RawScreen *raw_screen)
 {
-    uint8_t x = 0;
-    uint8_t y = 0;
-    for (x = 0; x < BLOCK_COUNT_X; ++x)
-    {
-        for (y = 0; y < BLOCK_COUNT_Y; ++y)
-        {
-            (char_screen->_is_mod)[x][y] = false;
-        }
-    }
-}
-
-void draw(CharScreen *char_screen, RawScreen *raw_screen)
-{
-    uint8_t pblock_x = 0;
-    uint8_t pblock_y = 0;
-    PblockBitmap pblock_bitmap = { 0 };
+    uint8_t page_block_x = 0;
+    uint8_t page_block_y = 0;
+    PageBlockBitmap page_block_bitmap = { 0 };
     // Iterate over all page blocks and check if modification needed.
-    for (pblock_y = 0; pblock_y < PAGE_COUNT; ++pblock_y)
+    for (page_block_y = 0; page_block_y < PAGE_COUNT; ++page_block_y)
     {
-        for (pblock_x = 0; pblock_x < BLOCK_COUNT_X; ++pblock_x)
+        for (page_block_x = 0; page_block_x < BLOCK_COUNT_X; ++page_block_x)
         {
-            if (_need_mod(char_screen, pblock_x, pblock_y))
+            if (_is_page_block_need_mod(char_screen, page_block_row_map,
+                                        page_block_x, page_block_y))
             {
-                _gen_pblock_bitmap(char_screen, pblock_x, pblock_y,
-                                   &pblock_bitmap);
-                draw_from_pblock_bitmap(raw_screen, pblock_x, pblock_y,
-                                        &pblock_bitmap);
+                _gen_page_block_bitmap(char_screen, page_block_row_map,
+                                       unicode_bitmap, page_block_x,
+                                       page_block_y, &page_block_bitmap);
+                draw_from_page_block_bitmap(raw_screen, page_block_x,
+                                            page_block_y, &page_block_bitmap);
             }
         }
     }
-    _clear_diff(char_screen);
+    _clear_char_screen_diff(char_screen);
 }
 
-bool _need_mod(CharScreen *char_screen, uint8_t pblock_x, uint8_t pblock_y)
+bool _is_page_block_need_mod(CharScreen *char_screen,
+                             PageBlockRowMap *page_block_row_map,
+                             uint8_t page_block_x, uint8_t page_block_y)
 {
-    bool mod = false;
-    uint8_t cblock_x = pblock_x;
-    int8_t cblock_y = 0;
+    uint8_t char_block_x = page_block_x;
 
-    int8_t first_cblock = P2B_MAP[pblock_y][0];
-    int8_t last_cblock = P2B_MAP[pblock_y][1];
-    for (cblock_y = first_cblock; cblock_y < last_cblock + 1; ++cblock_y)
+    int16_t first_char_block = get_page_first_block(page_block_row_map,
+                                                    page_block_y);
+    int16_t last_char_block = get_page_last_block(page_block_row_map,
+                                                  page_block_y);
+
+    int16_t char_block_y = 0;
+    for (char_block_y = first_char_block; char_block_y < last_char_block + 1;
+            ++char_block_y)
     {
-        if ((cblock_y < 0) || (cblock_y > BLOCK_COUNT_Y - 1))
+        if ((char_block_y < 0) || (char_block_y > BLOCK_COUNT_Y - 1))
         {
-            mod = mod || false;
+            continue; // Consider as not modified
         }
-        else
+        if ((char_screen->_char_info)[char_block_x][char_block_y].need_mod
+                == true)
         {
-            mod = mod || (char_screen->_is_mod)[cblock_x][cblock_y];
+            return true;
         }
     }
-    return mod;
+    return false;
 }
 
-void _gen_pblock_bitmap(CharScreen *char_screen, uint8_t pblock_x,
-                        uint8_t pblock_y, PblockBitmap *pblock_bitmap)
+void _gen_page_block_bitmap(CharScreen *char_screen,
+                            PageBlockRowMap *page_block_row_map,
+                            UnicodeBitmapMapPtr *unicode_bitmap,
+                            uint8_t page_block_x, uint8_t page_block_y,
+                            PageBlockBitmap *page_block_bitmap)
 {
-    uint8_t cblock_x = pblock_x;
+    uint8_t char_block_x = page_block_x;
 
-    int8_t first_cblock = P2B_MAP[pblock_y][0];
-    int8_t last_cblock = P2B_MAP[pblock_y][1];
+    int16_t first_char_block = get_page_first_block(page_block_row_map,
+                                                    page_block_y);
+    int16_t last_char_block = get_page_last_block(page_block_row_map,
+                                                  page_block_y);
 
-    uint8_t first_cblock_line = 0;
-    uint8_t last_cblock_line = 0;
+    uint8_t first_char_block_row = 0;
+    uint8_t last_char_block_row = 0;
 
-    uint64_t character = 0x0000;
-
-    int8_t cblock_y = 0;
-    uint8_t pblock_line = 0;
-    uint8_t cblock_line = 0;
-    for (cblock_y = first_cblock; cblock_y < last_cblock + 1; ++cblock_y)
+    int16_t char_block_y = 0;
+    uint8_t page_block_row = 0;
+    uint8_t char_block_row = 0;
+    for (char_block_y = first_char_block; char_block_y < last_char_block + 1;
+            ++char_block_y)
     {
-        first_cblock_line = PB2L_MAP[pblock_y][cblock_y + 1][0];
-        last_cblock_line = PB2L_MAP[pblock_y][cblock_y + 1][1];
-        for (cblock_line = first_cblock_line;
-                cblock_line < last_cblock_line + 1; ++cblock_line)
+        first_char_block_row = get_page_block_first_row(page_block_row_map,
+                                                        page_block_y,
+                                                        char_block_y);
+        last_char_block_row = get_page_block_last_row(page_block_row_map,
+                                                      page_block_y,
+                                                      char_block_y);
+        for (char_block_row = first_char_block_row;
+                char_block_row < last_char_block_row + 1; ++char_block_row)
         {
-            if ((cblock_y < 0) || (cblock_y > BLOCK_COUNT_Y - 1))
-            {
-                character = EMPTY_CHAR;
-            }
-            else
-            {
-                character = char_screen->_content[cblock_x][cblock_y];
-            }
-            (*pblock_bitmap)[pblock_line] = CHAR_MAP[character][cblock_line];
-            pblock_line += 1;
+            (*page_block_bitmap)[page_block_row] = _gen_page_block_row_bitmap(
+                    char_screen, unicode_bitmap, char_block_x, char_block_y,
+                    char_block_row);
+            page_block_row += 1;
         }
     }
 }
 
-void test_char_screen()
+BlockRowBitmap _gen_page_block_row_bitmap(CharScreen *char_screen,
+                                          UnicodeBitmapMapPtr *unicode_bitmap,
+                                          uint8_t char_block_x,
+                                          int16_t char_block_y,
+                                          uint8_t char_block_row)
 {
-    CharScreen char_screen = new_char_screen();
-    RawScreen raw_screen;
-    set_block(&char_screen, 0, 0, 1);
-    set_block(&char_screen, 0, 1, 1);
-    set_block(&char_screen, 0, 2, 1);
-    set_block(&char_screen, 0, 3, 1);
-    draw(&char_screen, &raw_screen);
-    printf("------\n");
-    clear_content(&char_screen);
-    draw(&char_screen, &raw_screen);
-    printf("------\n");
-    set_block(&char_screen, 2, 0, 1);
-    set_block(&char_screen, 2, 0, 1);
-    set_block(&char_screen, 2, 1, 1);
-    set_block(&char_screen, 2, 3, 1);
-    set_block(&char_screen, 2, 4, 1);
-    draw(&char_screen, &raw_screen);
-    printf("------\n");
+    Side side = Left;
+    Unicode character = 0x0000;
+    if ((char_block_y < 0) || (char_block_y > BLOCK_COUNT_Y - 1))
+    {
+        character = EMPTY_CHAR;
+        side = EMPTY_CHAR_SIDE;
+    }
+    else
+    {
+        character =
+                (char_screen->_char_info)[char_block_x][char_block_y].next_char;
+        side = (char_screen->_char_info)[char_block_x][char_block_y].next_side;
+
+        (char_screen->_char_info)[char_block_x][char_block_y].character =
+                (char_screen->_char_info)[char_block_x][char_block_y].next_char;
+        (char_screen->_char_info)[char_block_x][char_block_y].side =
+                (char_screen->_char_info)[char_block_x][char_block_y].next_side;
+    }
+
+//    BlockRowBitmap fullwidth_row_bitmap = get_unicode_row_bitmap(
+//            unicode_bitmap, character, char_block_row);
+    BlockRowBitmap fullwidth_row_bitmap = 0;
+//            UNICODE_BITMAP_MAP[character][char_block_row];
+
+    BlockRowBitmap halfwidth_row_bitmap = 0;
+    if (side == Right)
+    {
+        halfwidth_row_bitmap = fullwidth_row_bitmap & BLOCK_BITMAP_HALF_MASK;
+    }
+    else
+    {
+        halfwidth_row_bitmap = fullwidth_row_bitmap >> BLOCK_HALF_WIDTH;
+    }
+    return halfwidth_row_bitmap;
+
 }
+
+//const uint16_t UNICODE_BITMAP_MAP[2][BLOCK_HEIGHT] = { { 0b000000000000,
+//                                                         0b000000000000,
+//                                                         0b011100000000,
+//                                                         0b100010000000,
+//                                                         0b100110000000,
+//                                                         0b101010000000,
+//                                                         0b101010000000,
+//                                                         0b110010000000,
+//                                                         0b100010000000,
+//                                                         0b011100000000,
+//                                                         0b000000000000,
+//                                                         0b000000000000 },
+//                                                       { 0b000000000000,
+//                                                         0b000000000000,
+//                                                         0b010000000000,
+//                                                         0b110000000000,
+//                                                         0b010000000000,
+//                                                         0b010000000000,
+//                                                         0b010000000000,
+//                                                         0b010000000000,
+//                                                         0b010000000000,
+//                                                         0b111000000000,
+//                                                         0b000000000000,
+//                                                         0b000000000000 } };
 

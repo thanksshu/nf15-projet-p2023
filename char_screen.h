@@ -4,12 +4,31 @@
 #define CHAR_SCREEN_H_
 
 /**
- * Screen with character blocks
+ * Half side of the full width bitmap, cause full width bitmap won't fit
+ */
+typedef enum
+{
+    Left, Right
+} Side;
+
+/**
+ * Info of a char_block
  */
 typedef struct
 {
-    uint64_t _content[BLOCK_COUNT_X][BLOCK_COUNT_Y];
-    bool _is_mod[BLOCK_COUNT_X][BLOCK_COUNT_Y];
+    Unicode character;
+    Unicode next_char;
+    Side side;
+    Side next_side;
+    bool need_mod;
+} CharInfo;
+
+/**
+ * Screen with char blocks
+ */
+typedef struct
+{
+    CharInfo _char_info[BLOCK_COUNT_X][BLOCK_COUNT_Y];
 } CharScreen;
 
 /**
@@ -18,35 +37,51 @@ typedef struct
 CharScreen new_char_screen();
 
 /**
- * Set given block of CharScreen to a character
+ * Set given char block of CharScreen to a character
  */
-void set_block(CharScreen *char_screen, uint8_t x, uint8_t y,
-               uint64_t character);
+void set_char_block(CharScreen *char_screen, uint8_t x, uint8_t y,
+                    Unicode character, Side side);
 
 /**
- * Set all blocks of CharScreen to "empty"
+ * Set all char blocks of CharScreen to "empty"
  */
-void clear_content(CharScreen *char_screen);
+void clear_char_screen(CharScreen *char_screen);
 
 /**
- * Set all blocks' "is modified" status of CharScreen to false
+ * Set all char blocks "is modified" status to false
  */
-void _clear_diff(CharScreen *char_screen);
+void _clear_char_screen_diff(CharScreen *char_screen);
 
 /**
  * Pump CharScreen to RawScreen
  */
-void draw(CharScreen *char_screen, RawScreen *raw_screen);
+void draw_char_screen(CharScreen *char_screen,
+                      PageBlockRowMap *page_block_row_map,
+                      UnicodeBitmapMapPtr *unicode_bitmap,
+                      RawScreen *raw_screen);
 
 /**
  * Check if a page block need to be modified
  */
-bool _need_mod(CharScreen *char_screen, uint8_t pblock_x, uint8_t pblock_y);
+bool _is_page_block_need_mod(CharScreen *char_screen,
+                             PageBlockRowMap *page_block_row_map,
+                             uint8_t page_block_x, uint8_t page_block_y);
 
 /**
  * Generate bitmap for a page block
  */
-void _gen_pblock_bitmap(CharScreen *char_screen, uint8_t pblock_x,
-                        uint8_t pblock_y, PblockBitmap *pblock_bitmap);
+void _gen_page_block_bitmap(CharScreen *char_screen,
+                            PageBlockRowMap *page_block_row_map,
+                            UnicodeBitmapMapPtr *unicode_bitmap,
+                            uint8_t page_block_x, uint8_t page_block_y,
+                            PageBlockBitmap *page_block_bitmap);
+
+/**
+ * Generate bitmap for a page block's row
+ */
+BlockRowBitmap _gen_page_block_row_bitmap(CharScreen *char_screen, UnicodeBitmapMapPtr *unicode_bitmap,
+                                          uint8_t char_block_x,
+                                          int16_t char_block_y,
+                                          uint8_t char_block_row);
 
 #endif

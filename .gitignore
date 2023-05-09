@@ -27,3 +27,4 @@ makefile
 *.uniflashsession
 
 .ccsproject
+.bdf
