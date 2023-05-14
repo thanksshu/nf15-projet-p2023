@@ -1,44 +1,99 @@
 #include "includes.h"
 
-void draw_from_page_block_bitmap(RawScreen *raw_screen, uint8_t page_block_x,
-                                 uint8_t page_block_y,
-                                 PageBlockBitmap *page_block_bitmap)
+void command_raw_screen(uint8_t data, bool data_mode)
 {
-    uint8_t pblock_row = 0;
-    uint8_t row_bitmap = 0;
-    BlockRowBitmap mask = 0;
-
-    printf("+%d++%d+\n", page_block_x, page_block_y);
-    for (pblock_row = 0; pblock_row < PAGE_HEIGHT; ++pblock_row)
+    while (!(EUSCI_A1->IFG & EUSCI_A_IFG_TXIFG))
     {
-        row_bitmap = (*page_block_bitmap)[pblock_row];
-        for (mask = 1 << (BLOCK_HALF_WIDTH - 1); mask != 0; mask >>= 1)
-        {
-            // TODO: Draw from page block bitmap
-            if (row_bitmap & mask)
-            {
-                printf(" ");
-            }
-            else
-            {
-                printf("#");
-            }
-        }
-        printf("\n");
+        // Wait until ready to send
     }
+
+    // Set status of A0
+    if (data_mode)
+    {
+        P2->OUT |= BIT5;
+    }
+    else
+    {
+        P2->OUT &= ~BIT5;
+    }
+
+    EUSCI_A1->TXBUF = data;  // send data and clear TXIFG
 }
 
-uint8_t _gen_pblock_col_bitmap(PageBlockBitmap *page_block_bitmap,
-                               uint8_t bitmap_col)
+void init_raw_screen_spi(void)
 {
-    char bit = 0; // for only 1 bit
-    uint8_t pblock_col_bitmap = 0;
-    uint8_t bitmap_row = 0;
-    for (bitmap_row = 0; bitmap_row < PAGE_HEIGHT + 1; ++bitmap_row)
-    {
-        bit = ((*page_block_bitmap)[bitmap_row]
-                >> (BLOCK_HALF_WIDTH - 1 - bitmap_col)) & 1; // pick the bit at pblock_col
-        pblock_col_bitmap |= bit << bitmap_row; // put at bitmap_col
-    }
-    return pblock_col_bitmap;
+    /* Initialise UCA1 as SPI for the screen */
+    P2->SEL0 |= BIT0 | BIT1 | BIT2 | BIT3; // Use UCA1 with P2.0, P2.1, P2.2, P2.3
+
+    EUSCI_A1->CTLW0 |= EUSCI_A_CTLW0_SWRST; // Enter reset mode (start register configuration)
+
+    EUSCI_A1->CTLW0 |= (EUSCI_A_CTLW0_UCSSEL_2 | // Use SMCLK as clock
+            EUSCI_A_CTLW0_SYNC | // Synchrony mode
+            EUSCI_A_CTLW0_MST | // Master Mode
+            EUSCI_A_CTLW0_CKPL | // Polarity = 1
+            EUSCI_A_CTLW0_CKPH | // Phase = 1
+            EUSCI_A_CTLW0_MSB);  // Send MSB first
+
+    EUSCI_A1->CTLW0 &= ~EUSCI_A_CTLW0_SWRST; // Quit reset mode (end register configuration)
+
+    // Start interruption
+    NVIC_EnableIRQ(EUSCIA1_IRQn);
+    __enable_irq();
+
+    /* Initialise P2.5 as A0 for the screen */
+    P2->SEL0 &= ~BIT5;
+    P2->SEL1 &= ~BIT5;
+    P2->DIR |= BIT5;
+    P2->OUT &= ~BIT5;
+
+    /* Initialise P2.4 as RST for the screen */
+    P2->SEL0 &= ~BIT4;
+    P2->SEL1 &= ~BIT4;
+    P2->DIR |= BIT4;
+    P2->OUT |= BIT4; // Quit reset mode
 }
+
+void init_raw_screen_display()
+{
+    command_raw_screen(0x40, false);
+    command_raw_screen(0xA1, false);
+    command_raw_screen(0xC0, false);
+    command_raw_screen(0xA6, false);
+    command_raw_screen(0xA2, false);
+    command_raw_screen(0x2F, false);
+    command_raw_screen(0xF8, false);
+    command_raw_screen(0x00, false);
+    command_raw_screen(0x27, false);
+    command_raw_screen(0x81, false);
+    command_raw_screen(0x10, false);
+    command_raw_screen(0xAC, false);
+    command_raw_screen(0x00, false);
+}
+
+void turn_raw_screen_on()
+{
+    command_raw_screen(0xAF, false);
+}
+
+void turn_raw_screen_off()
+{
+    command_raw_screen(0xAE, false);
+
+}
+
+void select_raw_screen_page(int page)
+{
+    command_raw_screen((0b1011 << 4) | page, false);
+}
+
+void select_raw_screen_column(int column)
+{
+    command_raw_screen((0b0001 << 4) | (column >> 4), false); // Select column MSB 4bit
+    command_raw_screen((0b0000 << 4) | (column & (~0b11110000)), false); // Select column LSB 4bit
+}
+
+void draw_raw_screen_page_column(uint8_t bitmap)
+{
+    command_raw_screen(bitmap, true);
+}
+

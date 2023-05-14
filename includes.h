@@ -19,9 +19,7 @@
 
 /* Include user defined */
 #include "config.h"
-#include "unicode_bitmap_map.h"
-#include "page_block_row_map.h"
 #include "raw_screen.h"
-#include "char_screen.h"
+#include "screen_controller.h"
 
 #endif /* INCLUDES_H_ */

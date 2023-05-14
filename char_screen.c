@@ -4,7 +4,7 @@ CharScreen new_char_screen()
 {
     CharScreen char_screen;
     clear_char_screen(&char_screen);
-    _clear_char_screen_diff(&char_screen);
+    clear_char_screen_diff(&char_screen);
     return char_screen;
 }
 
@@ -42,7 +42,7 @@ void clear_char_screen(CharScreen *char_screen)
     }
 }
 
-void _clear_char_screen_diff(CharScreen *char_screen)
+void clear_char_screen_diff(CharScreen *char_screen)
 {
     uint8_t x = 0;
     uint8_t y = 0;
@@ -55,9 +55,7 @@ void _clear_char_screen_diff(CharScreen *char_screen)
     }
 }
 
-void draw_char_screen(CharScreen *char_screen,
-                      PageBlockRowMap *page_block_row_map,
-                      UnicodeBitmapMapPtr *unicode_bitmap, RawScreen *raw_screen)
+void draw_char_screen(CharScreen *char_screen, RawScreen *raw_screen)
 {
     uint8_t page_block_x = 0;
     uint8_t page_block_y = 0;
@@ -67,23 +65,21 @@ void draw_char_screen(CharScreen *char_screen,
     {
         for (page_block_x = 0; page_block_x < BLOCK_COUNT_X; ++page_block_x)
         {
-            if (_is_page_block_need_mod(char_screen, page_block_row_map,
-                                        page_block_x, page_block_y))
+            if (is_page_block_need_mod(char_screen, page_block_row_map,
+                                       page_block_x, page_block_y))
             {
-                _gen_page_block_bitmap(char_screen, page_block_row_map,
-                                       unicode_bitmap, page_block_x,
-                                       page_block_y, &page_block_bitmap);
+                gen_page_block_bitmap(char_screen, page_block_x, page_block_y,
+                                      &page_block_bitmap);
                 draw_from_page_block_bitmap(raw_screen, page_block_x,
                                             page_block_y, &page_block_bitmap);
             }
         }
     }
-    _clear_char_screen_diff(char_screen);
+    clear_char_screen_diff(char_screen);
 }
 
-bool _is_page_block_need_mod(CharScreen *char_screen,
-                             PageBlockRowMap *page_block_row_map,
-                             uint8_t page_block_x, uint8_t page_block_y)
+bool is_page_block_need_mod(CharScreen *char_screen, uint8_t page_block_x,
+                            uint8_t page_block_y)
 {
     uint8_t char_block_x = page_block_x;
 
@@ -109,11 +105,9 @@ bool _is_page_block_need_mod(CharScreen *char_screen,
     return false;
 }
 
-void _gen_page_block_bitmap(CharScreen *char_screen,
-                            PageBlockRowMap *page_block_row_map,
-                            UnicodeBitmapMapPtr *unicode_bitmap,
-                            uint8_t page_block_x, uint8_t page_block_y,
-                            PageBlockBitmap *page_block_bitmap)
+void gen_page_block_bitmap(CharScreen *char_screen, uint8_t page_block_x,
+                           uint8_t page_block_y,
+                           PageBlockBitmap *page_block_bitmap)
 {
     uint8_t char_block_x = page_block_x;
 
@@ -141,15 +135,13 @@ void _gen_page_block_bitmap(CharScreen *char_screen,
                 char_block_row < last_char_block_row + 1; ++char_block_row)
         {
             (*page_block_bitmap)[page_block_row] = _gen_page_block_row_bitmap(
-                    char_screen, unicode_bitmap, char_block_x, char_block_y,
-                    char_block_row);
+                    char_screen, char_block_x, char_block_y, char_block_row);
             page_block_row += 1;
         }
     }
 }
 
 BlockRowBitmap _gen_page_block_row_bitmap(CharScreen *char_screen,
-                                          UnicodeBitmapMapPtr *unicode_bitmap,
                                           uint8_t char_block_x,
                                           int16_t char_block_y,
                                           uint8_t char_block_row)
@@ -188,31 +180,5 @@ BlockRowBitmap _gen_page_block_row_bitmap(CharScreen *char_screen,
         halfwidth_row_bitmap = fullwidth_row_bitmap >> BLOCK_HALF_WIDTH;
     }
     return halfwidth_row_bitmap;
-
 }
-
-//const uint16_t UNICODE_BITMAP_MAP[2][BLOCK_HEIGHT] = { { 0b000000000000,
-//                                                         0b000000000000,
-//                                                         0b011100000000,
-//                                                         0b100010000000,
-//                                                         0b100110000000,
-//                                                         0b101010000000,
-//                                                         0b101010000000,
-//                                                         0b110010000000,
-//                                                         0b100010000000,
-//                                                         0b011100000000,
-//                                                         0b000000000000,
-//                                                         0b000000000000 },
-//                                                       { 0b000000000000,
-//                                                         0b000000000000,
-//                                                         0b010000000000,
-//                                                         0b110000000000,
-//                                                         0b010000000000,
-//                                                         0b010000000000,
-//                                                         0b010000000000,
-//                                                         0b010000000000,
-//                                                         0b010000000000,
-//                                                         0b111000000000,
-//                                                         0b000000000000,
-//                                                         0b000000000000 } };
 

@@ -1,34 +1,17 @@
-#include "includes.h"
+/*
+ * SPI commands to communicate with the "physical screen" (raw screen)
+ */
 
 #ifndef RAW_SCREEN_H_
 #define RAW_SCREEN_H_
 
-
-
-/**
- * Page block bitmap
- */
-typedef BlockRowBitmap PageBlockBitmap[PAGE_HEIGHT];
-
-/**
- * Represents the "physical screen"
- */
-typedef struct
-{
-    uint8_t _current_page;
-    uint8_t _current_col;
-} RawScreen;
-
-/**
- * Draw a pblock bitmap on to the real screen
- *
- */
-void draw_from_page_block_bitmap(RawScreen *raw_screen, uint8_t page_block_x,
-                             uint8_t page_block_y, PageBlockBitmap *page_block_bitmap);
-
-/**
- * Generate a column for the real screen
- */
-uint8_t _gen_pblock_col_bitmap(PageBlockBitmap *page_block_bitmap, uint8_t bitmap_col);
+void init_raw_screen_spi();
+void command_raw_screen(uint8_t data, bool mode_write);
+void init_raw_screen_display();
+void turn_raw_screen_on();
+void turn_raw_screen_off();
+void select_raw_screen_page(int page);
+void select_raw_screen_column(int column);
+void draw_raw_screen_page_column(uint8_t bitmap);
 
 #endif /* RAW_SCREEN_H_ */
