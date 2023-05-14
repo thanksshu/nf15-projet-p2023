@@ -5,7 +5,7 @@
 #ifndef RAW_SCREEN_H_
 #define RAW_SCREEN_H_
 
-void init_raw_screen_spi();
+void init_raw_screen_communication();
 void command_raw_screen(uint8_t data, bool mode_write);
 void init_raw_screen_display();
 void turn_raw_screen_on();

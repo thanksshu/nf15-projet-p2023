@@ -1,53 +1,40 @@
 /*
- * main.c
- *
  * Main executable
  */
 
 #include "includes.h"
 
-int main(void)
+int main()
 {
-    /* stop watchdog  */
+    // Stop WatchDog
     MAP_WDT_A_holdTimer();
 
-    /* Initialise screen */
-    RawScreen raw_screen;
-    PageBlockRowMap PAGE_BLOCK_ROW_MAP = new_page_block_row_map(); // initial page block row map as a global constant
-    CharScreen char_screen = new_char_screen();
+    // Initialise SMCLK at 12MHz
+    CS_initClockSignal(CS_SMCLK, CS_MODOSC_SELECT, CS_CLOCK_DIVIDER_2);
 
-    // Test char screen
-    // TODO: RawScreen not finished
-    clear_char_screen(&char_screen);
-    draw_char_screen(&char_screen, &PAGE_BLOCK_ROW_MAP,
-                     &BITMAP_MAP, &raw_screen);
-    printf("------\n");
+    ScreenController screen_controller = new_screen_controller();
 
-    set_char_block(&char_screen, 0, 0, 0x0, Left);
-    set_char_block(&char_screen, 0, 1, 0x1, Right);
-    set_char_block(&char_screen, 0, 2, 0x0, Left);
-    set_char_block(&char_screen, 0, 3, 0x1, Left);
-    draw_char_screen(&char_screen, &PAGE_BLOCK_ROW_MAP,
-                     &BITMAP_MAP, &raw_screen);
-    printf("------\n");
+    turn_screen_on(&screen_controller);
 
-    clear_char_screen(&char_screen);
-    draw_char_screen(&char_screen, &PAGE_BLOCK_ROW_MAP,
-                     &BITMAP_MAP, &raw_screen);
-    printf("------\n");
-
-    set_char_block(&char_screen, 2, 0, 0x0, Left);
-    set_char_block(&char_screen, 2, 0, 0x1, Left);
-    set_char_block(&char_screen, 2, 0, 0x0, Left);
-    set_char_block(&char_screen, 2, 1, 0x1, Left);
-    set_char_block(&char_screen, 2, 2, 0x1, Left);
-    set_char_block(&char_screen, 2, 3, 0x1, Right);
-    set_char_block(&char_screen, 2, 4, 0x1, Left);
-    draw_char_screen(&char_screen, &PAGE_BLOCK_ROW_MAP,
-                     &BITMAP_MAP, &raw_screen);
-    printf("------\n");
+    set_screen_px(&screen_controller, 31, 63, true);
+    set_screen_px(&screen_controller, 10, 41, true);
+    set_screen_px(&screen_controller, 38, 16, true);
+    set_screen_px(&screen_controller, 20, 105, true);
+    set_screen_px(&screen_controller, 20, 51, true);
+    set_screen_px(&screen_controller, 47, 42, true);
+    set_screen_px(&screen_controller, 20, 105, true);
+    set_screen_px(&screen_controller, 16, 54, true);
+    set_screen_px(&screen_controller, 43, 53, true);
+    set_screen_px(&screen_controller, 16, 54, true);
+    set_screen_px(&screen_controller, 16, 54, true);
+    set_screen_px(&screen_controller, 31, 63, true);
+    set_screen_px(&screen_controller, 30, 89, true);
+    set_screen_px(&screen_controller, 0, 0, true);
+    set_screen_px(&screen_controller, 63, 127, true);
+    draw_screen(&screen_controller, false);
 
     while (1)
     {
+        // Prevent exit
     }
 }

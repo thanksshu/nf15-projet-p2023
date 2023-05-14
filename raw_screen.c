@@ -20,7 +20,7 @@ void command_raw_screen(uint8_t data, bool data_mode)
     EUSCI_A1->TXBUF = data;  // send data and clear TXIFG
 }
 
-void init_raw_screen_spi(void)
+void init_raw_screen_communication(void)
 {
     /* Initialise UCA1 as SPI for the screen */
     P2->SEL0 |= BIT0 | BIT1 | BIT2 | BIT3; // Use UCA1 with P2.0, P2.1, P2.2, P2.3
