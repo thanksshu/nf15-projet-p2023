@@ -8,6 +8,7 @@
 #define INCLUDES_H_
 
 /* Include driver */
+#include "ti/devices/msp432p4xx/inc/msp.h"
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
 /* Include standard library */
@@ -21,7 +22,7 @@
 #include "config.h"
 #include "physical_screen.h"
 #include "screen_controller.h"
-
 #include "ui_bitmaps/ui_bitmaps.h"
+#include "i2c.h"
 
 #endif /* INCLUDES_H_ */
