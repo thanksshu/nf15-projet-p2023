@@ -81,12 +81,12 @@ void turn_raw_screen_off()
 
 }
 
-void select_raw_screen_page(int page)
+void set_raw_screen_page(int page)
 {
     command_raw_screen((0b1011 << 4) | page, false);
 }
 
-void select_raw_screen_column(int column)
+void set_raw_screen_column(int column)
 {
     command_raw_screen((0b0001 << 4) | (column >> 4), false); // Select column MSB 4bit
     command_raw_screen((0b0000 << 4) | (column & (~0b11110000)), false); // Select column LSB 4bit

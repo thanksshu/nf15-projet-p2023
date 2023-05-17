@@ -19,7 +19,9 @@
 
 /* Include user defined */
 #include "config.h"
-#include "raw_screen.h"
+#include "physical_screen.h"
 #include "screen_controller.h"
+
+#include "ui_bitmaps/ui_bitmaps.h"
 
 #endif /* INCLUDES_H_ */

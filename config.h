@@ -10,13 +10,12 @@
 #define CONFIG_H_
 
 /* Configuration */
-
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define PAGE_HEIGHT 8 // MUST be exactly divisible by the SCREEN_HEIGHT
+#define CLEAR_SCREEN_COLOR 1
 
-/* End configuration */
-
+/* Auto Configurations */
 #define PAGE_COUNT (SCREEN_HEIGHT / PAGE_HEIGHT)
 
 #endif /* CONFIG_H_ */
