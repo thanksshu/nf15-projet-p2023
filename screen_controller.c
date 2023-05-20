@@ -60,7 +60,7 @@ void set_buffer_screen_bitmap(ScreenController *screen_controller, int x, int y,
     {
         for (pixel_y = 0; pixel_y < bitmap->width; ++pixel_y)
         {
-            pixel_index = pixel_y + bitmap->height * pixel_x;
+            pixel_index = pixel_y + bitmap->width * pixel_x;
             alpha = *(bitmap->alpha + pixel_index);
             if (alpha) // Only draw when solid
             {
@@ -107,6 +107,7 @@ void sync_screen(ScreenController *screen_controller, bool force_sync)
                 draw_raw_screen_page_column(*next_bitmap);
 
                 // Update screen controller
+                screen_controller->physical_cursor_column += 1; // After draw, the column will be increased by the physical screen
                 *current_bitmap = *next_bitmap;
             }
         }

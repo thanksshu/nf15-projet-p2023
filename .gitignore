@@ -28,4 +28,6 @@ makefile
 
 .ccsproject
 
-.bdf
+*.bdf
+test_*.piskel
+test_*_bitmap.c
