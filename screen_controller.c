@@ -15,14 +15,13 @@ ScreenController new_screen_controller()
 
 void turn_screen_on_off(ScreenController *screen_controller, bool on)
 {
-    switch (on)
+    if (on)
     {
-    case true:
         turn_physical_screen_on();
-        break;
-    case false:
+    }
+    else
+    {
         turn_physical_screen_off();
-        break;
     }
 }
 
@@ -62,8 +61,7 @@ void set_buffer_screen_bitmap(ScreenController *screen_controller, int x, int y,
     }
 }
 
-void set_buffer_screen_all(ScreenController *screen_controller,
-                                 Color color)
+void set_buffer_screen_all(ScreenController *screen_controller, Color color)
 {
     int x = 0;
     int y = 0;
