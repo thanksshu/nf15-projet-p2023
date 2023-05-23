@@ -22,9 +22,8 @@
 #include "config.h"
 #include "physical_screen.h"
 #include "screen_controller.h"
-#include "ui_text.h"
-#include "ui_bitmaps/ui_bitmaps.h"
-#include "ui_glyphs/ui_glyphs.h"
+#include "image_bitmaps/image_bitmaps.h"
+#include "glyph_bitmaps/glyph_bitmaps.h"
 #include "i2c.h"
 
 #endif /* INCLUDES_H_ */

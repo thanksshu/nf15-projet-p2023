@@ -61,9 +61,10 @@ for filename in next(walk(PISKEL_DIR), (None, None, []))[2]:  # [] if no file
 
 const Color {name}_color[{height}][{width}] = {str(bitmap_color).replace("[", "{ ").replace("]", " }")};
 const Alpha {name}_alpha[{height}][{width}] = {str(bitmap_alpha).replace("[", "{ ").replace("]", " }")};
-const Bitmap {name}_bitmap = {{ .height = {height}, .width = {width}, .color =
-                                     (Color*) {name}_color,
-                             .alpha = (Alpha*) {name}_alpha }};
+const Bitmap {name}_bitmap = {{ .height = {height}, 
+                                .width = {width}, 
+                                .color = (Color*) {name}_color, 
+                                .alpha = (Alpha*) {name}_alpha }};
 """
 
     with open(f"{name}_bitmap.c", "w") as file:
@@ -77,16 +78,16 @@ h_file_content = "".join(
  */
 #include "../includes.h"
 
-#ifndef UI_BITMAPS_H_
-#define UI_BITMAPS_H_
+#ifndef IMAGE_BITMAPS_H_
+#define IMAGE_BITMAPS_H_
 
 """,
         *[f"extern const Bitmap {name}_bitmap;\n" for name in names],
         """
-#endif /* BITMAP_H_ */
+#endif /* IMAGE_BITMAPS_H_ */
 """,
     ]
 )
 
-with open(f"ui_bitmaps.h", "w") as file:
+with open(f"image_bitmaps.h", "w") as file:
     file.write(h_file_content)

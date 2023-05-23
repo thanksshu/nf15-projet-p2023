@@ -18,9 +18,15 @@ int main()
 
     turn_screen_on_off(&screen_controller, true);
 
-    sync_screen(&screen_controller, false);
-
     while (1)
     {
+        set_buffer_screen_bitmap(&screen_controller, 0, 0,
+                                 (Bitmap*) &test_bitmap);
+        sync_screen(&screen_controller, false);
+        _delay_cycles(600000);
+        set_buffer_screen_bitmap(&screen_controller, 40, 60,
+                                 (Bitmap*) &u003e_bitmap);
+        sync_screen(&screen_controller, false);
+        _delay_cycles(600000);
     }
 }

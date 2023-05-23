@@ -7,7 +7,7 @@ from pprint import pprint
 class BitmapFont:
     def __init__(self, filename, max_unicode=0xFFFF):
         # Glyph
-        self.glyph_width = 0
+        self.glyph_full_width = 0
         self.glyph_half_width = 0
         self.glyph_height = 0
 
@@ -60,11 +60,11 @@ class BitmapFont:
                     size_in_pt = int(args[1])  # The "pt" unit is for printing
                     horizontal_dpi = int(args[2])
                     vertical_dpi = int(args[3])
-                    self.glyph_width = ceil(
+                    self.glyph_full_width = ceil(
                         size_in_pt / 72 * horizontal_dpi
                     )  # Convert pt to px
-                    self.glyph_half_width = self.glyph_width // 2
-                    self.glyph_width_mask = (1 << self.glyph_width) - 1
+                    self.glyph_half_width = self.glyph_full_width // 2
+                    self.glyph_width_mask = (1 << self.glyph_full_width) - 1
                     self.glyph_half_width_mask = (1 << self.glyph_half_width) - 1
                     self.glyph_height = ceil(size_in_pt / 72 * vertical_dpi)
                 case "FONTBOUNDINGBOX":
@@ -183,5 +183,5 @@ if __name__ == "__main__":
     for glyph in bitmap_font.glyphs:
         print(f"width : {glyph['width']}")
         for row in glyph["bitmap"]:
-            print(f"{row:0>{bitmap_font.glyph_width}b}".replace("1", "█"))
+            print(f"{row:0>{bitmap_font.glyph_full_width}b}".replace("1", "█"))
         print()

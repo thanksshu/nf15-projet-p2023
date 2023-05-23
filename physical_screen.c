@@ -6,7 +6,7 @@ void command_physical_screen(uint8_t data, bool data_mode)
     if ((P2->OUT & BIT5 ) != (data_mode << 5))
     {
         P2->OUT = (P2->OUT & ~BIT5 ) | (data_mode << 5);
-        _delay_cycles(300); // Wait for A0 settling down
+        _delay_cycles(90); // Wait for A0 settling down
     }
 
     while (!(EUSCI_A1->IFG & EUSCI_A_IFG_TXIFG))
