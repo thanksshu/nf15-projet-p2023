@@ -20,7 +20,10 @@
 
 /* Include user defined */
 #include "config.h"
-#include "raw_screen.h"
+#include "physical_screen.h"
 #include "screen_controller.h"
+#include "image_bitmaps/image_bitmaps.h"
+#include "glyph_bitmaps/glyph_bitmaps.h"
 #include "i2c.h"
+
 #endif /* INCLUDES_H_ */

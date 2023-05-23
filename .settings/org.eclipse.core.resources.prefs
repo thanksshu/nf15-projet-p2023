@@ -1,6 +1,10 @@
 eclipse.preferences.version=1
 encoding//Debug/ccs/subdir_rules.mk=UTF-8
 encoding//Debug/ccs/subdir_vars.mk=UTF-8
+encoding//Debug/glyph_bitmaps/subdir_rules.mk=UTF-8
+encoding//Debug/glyph_bitmaps/subdir_vars.mk=UTF-8
+encoding//Debug/image_bitmaps/subdir_rules.mk=UTF-8
+encoding//Debug/image_bitmaps/subdir_vars.mk=UTF-8
 encoding//Debug/makefile=UTF-8
 encoding//Debug/objects.mk=UTF-8
 encoding//Debug/optimizerAssistant/opt_for_speed__0/ccs/subdir_rules.mk=UTF-8

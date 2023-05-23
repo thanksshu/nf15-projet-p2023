@@ -1,5 +1,5 @@
 /*
- * Controller for the "physical screen" (raw screen)
+ * Controller for the physical screen
  */
 
 #include "includes.h"
@@ -7,66 +7,66 @@
 #ifndef SCREEN_CONTROLLER_H_
 #define SCREEN_CONTROLLER_H_
 
-/**
- * Raw screen page column bitmap
- */
-typedef struct {
-    uint8_t next_bitmap; // bitmap for next draw call, MSB first
-    uint8_t current_bitmap; // current bitmap on raw screen, MSB first
-} RawScreenPageColumn;
+typedef bool Color; // 1 for white, 0 for black
+typedef bool Alpha; // 1 for coloured, 0 for transparent
 
 /**
- * Represents the "physical screen"
+ * A bitmap map for draw image on screen
  */
 typedef struct
 {
-    RawScreenPageColumn content[PAGE_COUNT][SCREEN_WIDTH];
+    int height;
+    int width;
+    Color *color;
+    Alpha *alpha;
+} Bitmap;
 
-    // Raw screen's current selected page and column
-    int raw_screen_current_page;
-    int raw_screen_current_column;
-    bool display_on;
+/**
+ * Represents the "physical screen"
+ * We don't care about the position of the cursor
+ */
+typedef struct
+{
+    uint8_t physical_content[PAGE_COUNT][SCREEN_WIDTH];
+    uint8_t buffer_content[PAGE_COUNT][SCREEN_WIDTH];
 } ScreenController;
 
 /**
- * Change raw screen cursor
- * Will not change if already there, can be forced
- */
-void change_raw_screen_cursor(ScreenController *screen_controller, int page,
-                              int column, bool force_change);
-
-/**
- * Draw on raw screen
- * Will not draw pixels that are not changed, but can be forced to draw all
- */
-void draw_screen(ScreenController *screen_controller, bool draw_all);
-
-/**
- * Turn on raw screen
- */
-void turn_screen_on(ScreenController *screen_controller);
-
-/**
- * Turn on off screen
- */
-void turn_screen_off(ScreenController *screen_controller);
-
-/**
  * Factory method for screen controller
- * Raw screen will be cleared and its cursor will be set (0, 0)
+ * Raw screen will be cleared
  */
 ScreenController new_screen_controller();
 
 /**
- * Set one pixel on screen controller
- * Changes will be drawn on next draw call
+ * Draw screen buffer to raw screen
+ * Only sync when properties changed, can be forced to sync
  */
-void set_screen_px(ScreenController *screen_controller, int x, int y, bool px);
+void sync_screen(ScreenController *screen_controller, bool force_sync);
 
 /**
- * Clear all pixel on screen controller
- * Changes will be drawn on next draw call
+ * Set display on/off on screen buffer
+ * Changes will drawn to raw screen on next draw_screen call
  */
-void clear_screen(ScreenController *screen_controller);
+void turn_screen_on_off(ScreenController *screen_controller, bool on);
+
+/**
+ * Set one pixel on screen buffer
+ * Changes will drawn to raw screen on next draw_screen call
+ */
+void set_buffer_screen_pixel(ScreenController *screen_controller, int x, int y, Color color);
+
+/**
+ * Set pixels according to a bitmap
+ * Changes will drawn to raw screen on next draw_screen call
+ */
+void set_buffer_screen_bitmap(ScreenController *screen_controller, int x, int y,
+                              Bitmap *bitmap);
+
+/**
+ * Set all pixel on screen buffer
+ * Changes will drawn to raw screen on next draw_screen call
+ * Usually used for clear raw screen
+ */
+void set_buffer_screen_all(ScreenController *screen_controller, Color color);
 
 #endif /* SCREEN_CONTROLLER_H_ */
