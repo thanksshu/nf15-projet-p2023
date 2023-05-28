@@ -70,6 +70,8 @@ with open(f"glyph_bitmaps.c", "w") as file:
 # Generate .h file
 h_file_content.append(
     """
+extern const Bitmap u0020_bitmap;
+    
 #endif /* GLYPH_BITMAPS_H_ */
 """
 )

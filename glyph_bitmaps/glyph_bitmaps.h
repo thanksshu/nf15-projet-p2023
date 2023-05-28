@@ -14,6 +14,26 @@ extern const Bitmap u002c_bitmap;
 
 extern const Bitmap u002e_bitmap;
 
+extern const Bitmap u0030_bitmap;
+
+extern const Bitmap u0031_bitmap;
+
+extern const Bitmap u0032_bitmap;
+
+extern const Bitmap u0033_bitmap;
+
+extern const Bitmap u0034_bitmap;
+
+extern const Bitmap u0035_bitmap;
+
+extern const Bitmap u0036_bitmap;
+
+extern const Bitmap u0037_bitmap;
+
+extern const Bitmap u0038_bitmap;
+
+extern const Bitmap u0039_bitmap;
+
 extern const Bitmap u003a_bitmap;
 
 extern const Bitmap u003e_bitmap;
@@ -184,4 +204,6 @@ extern const Bitmap u0153_bitmap;
 
 extern const Bitmap u2103_bitmap;
 
+extern const Bitmap u0020_bitmap;
+    
 #endif /* GLYPH_BITMAPS_H_ */

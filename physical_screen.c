@@ -2,12 +2,9 @@
 
 void command_physical_screen(uint8_t data, bool data_mode)
 {
-    // Test if mode has changed
-    if ((P2->OUT & BIT5 ) != (data_mode << 5))
-    {
-        P2->OUT = (P2->OUT & ~BIT5 ) | (data_mode << 5);
-        _delay_cycles(90); // Wait for A0 settling down
-    }
+
+    P2->OUT = (P2->OUT & ~BIT5 ) | (data_mode << 5);
+    _delay_cycles(SPI_WAITING_TIME); // Wait for A0 settling down
 
     while (!(EUSCI_A1->IFG & EUSCI_A_IFG_TXIFG))
     {
@@ -34,7 +31,6 @@ void init_physical_screen_communication(void)
 
     // Start interruption
     NVIC_EnableIRQ(EUSCIA1_IRQn);
-    __enable_irq();
 
     /* Initialise P2.5 as A0 for the screen */
     P2->SEL0 &= ~BIT5;
@@ -46,6 +42,10 @@ void init_physical_screen_communication(void)
     P2->SEL0 &= ~BIT4;
     P2->SEL1 &= ~BIT4;
     P2->DIR |= BIT4;
+    P2->OUT |= BIT4; // Initialise reset
+    _delay_cycles(75000);
+    P2->OUT &= ~BIT4; // Enter reset mode
+    _delay_cycles(75000);
     P2->OUT |= BIT4; // Quit reset mode
 }
 

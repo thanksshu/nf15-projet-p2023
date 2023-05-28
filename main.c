@@ -16,17 +16,20 @@ int main()
 
     ScreenController screen_controller = new_screen_controller();
 
-    turn_screen_on_off(&screen_controller, true);
+    turn_physical_screen_on();
 
     while (1)
     {
-        set_buffer_screen_bitmap(&screen_controller, 0, 0,
-                                 (Bitmap*) &test_bitmap);
+        draw_buffer_screen_all(&screen_controller, 1);
+        draw_welcome_page(&screen_controller);
         sync_screen(&screen_controller, false);
-        _delay_cycles(600000);
-        set_buffer_screen_bitmap(&screen_controller, 40, 60,
-                                 (Bitmap*) &u003e_bitmap);
+
+        _delay_cycles(6000000);
+
+        draw_buffer_screen_all(&screen_controller, 1);
+        draw_result_page(&screen_controller);
         sync_screen(&screen_controller, false);
-        _delay_cycles(600000);
+
+        _delay_cycles(6000000);
     }
 }
