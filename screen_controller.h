@@ -23,7 +23,6 @@ typedef struct
 
 /**
  * Represents the "physical screen"
- * We don't care about the position of the cursor
  */
 typedef struct
 {
@@ -38,32 +37,30 @@ typedef struct
 ScreenController new_screen_controller();
 
 /**
- * Draw screen buffer to raw screen
+ * Update raw screen to screen buffer
  * Only sync when properties changed, can be forced to sync
  */
 void sync_screen(ScreenController *screen_controller, bool force_sync);
 
 /**
- * Set one pixel on screen buffer
+ * Draw one pixel on screen buffer
  */
-void set_buffer_screen_pixel(ScreenController *screen_controller, int x, int y, Color color);
+void draw_buffer_screen_pixel(ScreenController *screen_controller, int x, int y, Color color);
 
 /**
- * Set pixels according to a bitmap
+ * Draw pixels according to a bitmap on screen buffer
  */
 void draw_buffer_screen_bitmap(ScreenController *screen_controller, int x, int y,
                               Bitmap *bitmap);
 
 /**
- * Set bitmaps along a row, with a spacing of 1
+ * Draw bitmaps along a row on screen buffer
  */
 void draw_buffer_screen_bitmaps_on_row(ScreenController *screen_controller,
                                        int x, int y, Bitmap **bitmaps, int length);
 
 /**
- * Set all pixel on screen buffer
- * Changes will drawn to raw screen on next draw_screen call
- * Usually used for clear raw screen
+ * Draw all pixel on screen buffer
  */
 void draw_buffer_screen_all(ScreenController *screen_controller, Color color);
 

@@ -6,6 +6,8 @@
 #ifndef GLYPH_BITMAPS_H_
 #define GLYPH_BITMAPS_H_
 
+extern const Bitmap u0020_bitmap;
+
 extern const Bitmap u0022_bitmap;
 
 extern const Bitmap u0025_bitmap;
@@ -144,6 +146,8 @@ extern const Bitmap u007a_bitmap;
 
 extern const Bitmap u00ab_bitmap;
 
+extern const Bitmap u00b0_bitmap;
+
 extern const Bitmap u00bb_bitmap;
 
 extern const Bitmap u00c0_bitmap;
@@ -202,8 +206,5 @@ extern const Bitmap u0152_bitmap;
 
 extern const Bitmap u0153_bitmap;
 
-extern const Bitmap u2103_bitmap;
 
-extern const Bitmap u0020_bitmap;
-    
 #endif /* GLYPH_BITMAPS_H_ */

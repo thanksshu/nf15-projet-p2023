@@ -1,14 +1,17 @@
 """
-Generate bitmap from "piskels/*.piskel" to "{name}.c" and update "ui_bitmaps.h" file
-Note: Only the first frame of the first chunk of the first layer will be converted
-Note: Only white, black, transparent three pixels are supported
+Generate bitmap from "font.otf" to "glyph_bitmaps.c" and "glyph_bitmaps.h" file
 """
-from read_font import BitmapFont
+
+from PIL import Image, ImageFont, ImageDraw
 import json
 
-FONT_FILENAME = "font.bdf"
-CHARACTERS_FILENAME = "characters.json"
-bitmap_font = BitmapFont(FONT_FILENAME)
+FONT_PATH = "glyph_bitmaps/font.otf"
+CHARACTERS_PATH = "glyph_bitmaps/characters.json"
+FONT_SIZE = 12
+
+GLYPH_HEIGHT = (
+    12  # Ark Pixel Font is 18 high but our screen is small, here we need to crop it
+)
 
 c_file_content = []
 h_file_content = []
@@ -30,50 +33,57 @@ h_file_content.append(
 """
 )
 
-with open(CHARACTERS_FILENAME, encoding="utf-8") as chars_file:
+
+font = ImageFont.truetype(FONT_PATH, FONT_SIZE)
+with open(CHARACTERS_PATH, encoding="utf-8") as chars_file:
     chars = json.load(chars_file)["characters"]
     chars.sort()
     for char in chars:
-        unicode = ord(char)
-        glyph_width = bitmap_font.glyphs[unicode]["width"]
-        glyph_height = bitmap_font.glyph_height
+        glyph_width = font.getbbox(char)[2] - font.getbbox(char)[0]
+        glyph_height = sum(font.getmetrics())
+
+        glyph_height = GLYPH_HEIGHT  # Crop the glyph
+
+        image = Image.new("1", (glyph_width, glyph_height), 1)
+        draw = ImageDraw.Draw(image)
+
+        # draw.text(xy=(0, 0), text=char, font=font)
+        draw.text(xy=(0, -4), text=char, font=font)  # Crop the glyph
+
         glyph_color = [
-            [
-                0 if digit == "1" else 1  # Black if this bit need to be draw
-                for digit in f"{bitmap:0>{bitmap_font.glyph_full_width}b}"[:glyph_width]
-            ]
-            for bitmap in bitmap_font.glyphs[unicode]["bitmap"]
+            [image.getpixel((x, y)) for x in range(glyph_width)]
+            for y in range(glyph_height)
         ]
         glyph_alpha = [
             [1 for _ in range(glyph_width)]  # Solid background
             for _ in range(glyph_height)
         ]
 
+        bitmap_name = f"{ord(char):0>4x}"
         c_file_content.append(
             f"""
-const Color u{unicode:0>4x}_color[{glyph_height}][{glyph_width}] = {str(glyph_color).replace("[", "{ ").replace("]", " }")};
-const Alpha u{unicode:0>4x}_alpha[{glyph_height}][{glyph_width}] = {str(glyph_alpha).replace("[", "{ ").replace("]", " }")};
-const Bitmap u{unicode:0>4x}_bitmap = {{ .width = {glyph_width}, .height  = {glyph_height}, .color = (Color*) u{unicode:0>4x}_color, .alpha = (Alpha*) u{unicode:0>4x}_alpha }};
+const Color u{bitmap_name}_color[{glyph_height}][{glyph_width}] = {str(glyph_color).replace("[", "{ ").replace("]", " }")};
+const Alpha u{bitmap_name}_alpha[{glyph_height}][{glyph_width}] = {str(glyph_alpha).replace("[", "{ ").replace("]", " }")};
+const Bitmap u{bitmap_name}_bitmap = {{ .width = {glyph_width}, .height  = {glyph_height}, .color = (Color*) u{bitmap_name}_color, .alpha = (Alpha*) u{bitmap_name}_alpha }};
 """
         )
 
         h_file_content.append(
             f"""
-extern const Bitmap u{unicode:0>4x}_bitmap;
+extern const Bitmap u{bitmap_name}_bitmap;
 """
         )
 
 # Generate .c file
-with open(f"glyph_bitmaps.c", "w") as file:
+with open(f"glyph_bitmaps/glyph_bitmaps.c", "w") as file:
     file.write("".join(c_file_content))
 
 # Generate .h file
 h_file_content.append(
     """
-extern const Bitmap u0020_bitmap;
-    
+
 #endif /* GLYPH_BITMAPS_H_ */
 """
 )
-with open(f"glyph_bitmaps.h", "w") as file:
+with open(f"glyph_bitmaps/glyph_bitmaps.h", "w") as file:
     file.write("".join(h_file_content))

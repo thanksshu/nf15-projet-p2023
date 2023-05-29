@@ -3,13 +3,12 @@
 void command_physical_screen(uint8_t data, bool data_mode)
 {
 
-    P2->OUT = (P2->OUT & ~BIT5 ) | (data_mode << 5);
-    _delay_cycles(SPI_WAITING_TIME); // Wait for A0 settling down
-
     while (!(EUSCI_A1->IFG & EUSCI_A_IFG_TXIFG))
     {
         // Wait until ready to send
     }
+
+    P2->OUT = (P2->OUT & ~BIT5 ) | (data_mode << 5); // Set A0
     EUSCI_A1->TXBUF = data;  // send data and clear TXIFG
 }
 
@@ -20,11 +19,10 @@ void init_physical_screen_communication(void)
 
     EUSCI_A1->CTLW0 |= EUSCI_A_CTLW0_SWRST; // Enter reset mode (start register configuration)
 
-    EUSCI_A1->CTLW0 |= (EUSCI_A_CTLW0_UCSSEL_2 | // Use SMCLK as clock
+    EUSCI_A1->CTLW0 |= (EUSCI_A_CTLW0_SSEL__SMCLK | // Use SMCLK as clock
             EUSCI_A_CTLW0_SYNC | // Synchrony mode
             EUSCI_A_CTLW0_MST | // Master Mode
             EUSCI_A_CTLW0_CKPL | // Polarity = 1
-            EUSCI_A_CTLW0_CKPH | // Phase = 1
             EUSCI_A_CTLW0_MSB);  // Send MSB first
 
     EUSCI_A1->CTLW0 &= ~EUSCI_A_CTLW0_SWRST; // Quit reset mode (end register configuration)

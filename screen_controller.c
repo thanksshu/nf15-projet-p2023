@@ -7,18 +7,18 @@ ScreenController new_screen_controller()
     init_physical_screen_communication();
     init_physical_screen_display();
 
-    draw_buffer_screen_all(&screen_controller, 1); // Use white as cleared screen colour
+    draw_buffer_screen_all(&screen_controller, CLEAR_SCREEN_COLOR);
     sync_screen(&screen_controller, true); // Force to clear screen
 
     return screen_controller;
 }
 
-void set_buffer_screen_pixel(ScreenController *screen_controller, int x, int y,
-                             Color color)
+void draw_buffer_screen_pixel(ScreenController *screen_controller, int x, int y,
+                              Color color)
 {
-    int page = x / PAGE_COUNT;
-    int bit = x % PAGE_COUNT;
-    int col = y;
+    unsigned int page = x / PAGE_COUNT;
+    unsigned int bit = x % PAGE_COUNT;
+    unsigned int col = y;
 
     if (page >= PAGE_COUNT || bit >= PAGE_HEIGHT || col >= SCREEN_WIDTH)
     {
@@ -28,7 +28,8 @@ void set_buffer_screen_pixel(ScreenController *screen_controller, int x, int y,
     uint8_t mask = 1 << bit;
 
     uint8_t *bitmap = &(screen_controller->buffer_content[page][col]);
-    *bitmap = (*bitmap & ~mask) | (!color << bit); // Set the needed pixel only, colour need to be inverted
+    // Set the needed pixel only, colour need to be inverted cause the screen use 1 as display flag
+    *bitmap = (*bitmap & ~mask) | (!color << bit);
 }
 
 void draw_buffer_screen_bitmap(ScreenController *screen_controller, int x,
@@ -48,8 +49,8 @@ void draw_buffer_screen_bitmap(ScreenController *screen_controller, int x,
             if (alpha) // Only draw when solid
             {
                 color = *(bitmap->color + pixel_index);
-                set_buffer_screen_pixel(screen_controller, x + pixel_x,
-                                        y + pixel_y, color);
+                draw_buffer_screen_pixel(screen_controller, x + pixel_x,
+                                         y + pixel_y, color);
             }
         }
     }
@@ -66,7 +67,7 @@ void draw_buffer_screen_bitmaps_on_row(ScreenController *screen_controller,
     {
         draw_buffer_screen_bitmap(screen_controller, current_x, current_y,
                                   *(bitmaps + index));
-        current_y += (*(bitmaps + index))->width + 1; // 1 for spacing
+        current_y += (*(bitmaps + index))->width;
     }
 }
 
@@ -78,7 +79,7 @@ void draw_buffer_screen_all(ScreenController *screen_controller, Color color)
     {
         for (y = 0; y < SCREEN_WIDTH; ++y)
         {
-            set_buffer_screen_pixel(screen_controller, x, y, color);
+            draw_buffer_screen_pixel(screen_controller, x, y, color);
         }
     }
 }

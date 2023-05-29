@@ -2,6 +2,7 @@
 
 double get_temperature()
 {
+    _delay_cycles(1000); // Emulate I2C communication
     return 36.66;
 }
 
@@ -38,6 +39,7 @@ Bitmap* get_digit_bitmap(double number, int digit)
 
 void draw_result_page(ScreenController *screen_controller)
 {
+
     int index = 0;
     double temperatures[SAMPLE_COUNT] = { 0 };
     for (index = 0; index < SAMPLE_COUNT; ++index)
@@ -48,8 +50,8 @@ void draw_result_page(ScreenController *screen_controller)
     double max_temperature = max(temperatures, SAMPLE_COUNT);
     double mean_temperature = mean(temperatures, SAMPLE_COUNT);
 
-    int line_1_length = 21;
-    Bitmap *line_1_bitmaps[21] = { (Bitmap*) &u0054_bitmap,
+    int line_1_length = 11;
+    Bitmap *line_1_bitmaps[11] = { (Bitmap*) &u0054_bitmap,
                                    (Bitmap*) &u0065_bitmap,
                                    (Bitmap*) &u006d_bitmap,
                                    (Bitmap*) &u0070_bitmap,
@@ -59,19 +61,9 @@ void draw_result_page(ScreenController *screen_controller)
                                    (Bitmap*) &u0074_bitmap,
                                    (Bitmap*) &u0075_bitmap,
                                    (Bitmap*) &u0072_bitmap,
-                                   (Bitmap*) &u0065_bitmap,
-                                   (Bitmap*) &u0020_bitmap,
-                                   (Bitmap*) &u006d_bitmap,
-                                   (Bitmap*) &u0065_bitmap,
-                                   (Bitmap*) &u0073_bitmap,
-                                   (Bitmap*) &u0075_bitmap,
-                                   (Bitmap*) &u0072_bitmap,
-                                   (Bitmap*) &u00e9_bitmap,
-                                   (Bitmap*) &u0065_bitmap,
-                                   (Bitmap*) &u0020_bitmap,
-                                   (Bitmap*) &u003a_bitmap };
-    int line_2_length = 17;
-    Bitmap *line_2_bitmaps[17] = { (Bitmap*) &u004d_bitmap,
+                                   (Bitmap*) &u0065_bitmap, };
+    int line_2_length = 16;
+    Bitmap *line_2_bitmaps[16] = { (Bitmap*) &u004d_bitmap,
                                    (Bitmap*) &u0061_bitmap,
                                    (Bitmap*) &u0078_bitmap,
                                    (Bitmap*) &u0069_bitmap,
@@ -79,17 +71,17 @@ void draw_result_page(ScreenController *screen_controller)
                                    (Bitmap*) &u0061_bitmap,
                                    (Bitmap*) &u006c_bitmap,
                                    (Bitmap*) &u0065_bitmap,
-                                   (Bitmap*) &u0020_bitmap,
-                                   (Bitmap*) &u003a_bitmap,
-                                   (Bitmap*) &u0020_bitmap, get_digit_bitmap(
+                                   (Bitmap*) &u003a_bitmap, get_digit_bitmap(
                                            max_temperature, 1),
                                    get_digit_bitmap(max_temperature, 0),
                                    (Bitmap*) &u002e_bitmap, get_digit_bitmap(
                                            max_temperature, -1),
                                    get_digit_bitmap(max_temperature, -2),
-                                   (Bitmap*) &u2103_bitmap };
-    int line_3_length = 17;
-    Bitmap *line_3_bitmaps[17] = { (Bitmap*) &u004d_bitmap,
+                                   (Bitmap*) &u00b0_bitmap,
+                                   (Bitmap*) &u0043_bitmap };
+
+    int line_3_length = 16;
+    Bitmap *line_3_bitmaps[16] = { (Bitmap*) &u004d_bitmap,
                                    (Bitmap*) &u0069_bitmap,
                                    (Bitmap*) &u006e_bitmap,
                                    (Bitmap*) &u0069_bitmap,
@@ -97,41 +89,39 @@ void draw_result_page(ScreenController *screen_controller)
                                    (Bitmap*) &u0061_bitmap,
                                    (Bitmap*) &u006c_bitmap,
                                    (Bitmap*) &u0065_bitmap,
-                                   (Bitmap*) &u0020_bitmap,
-                                   (Bitmap*) &u003a_bitmap,
-                                   (Bitmap*) &u0020_bitmap, get_digit_bitmap(
+                                   (Bitmap*) &u003a_bitmap, get_digit_bitmap(
                                            min_temperature, 1),
                                    get_digit_bitmap(min_temperature, 0),
                                    (Bitmap*) &u002e_bitmap, get_digit_bitmap(
                                            min_temperature, -1),
                                    get_digit_bitmap(min_temperature, -2),
-                                   (Bitmap*) &u2103_bitmap };
-    int line_4_length = 16;
-    Bitmap *line_4_bitmaps[16] = { (Bitmap*) &u004d_bitmap,
+                                   (Bitmap*) &u00b0_bitmap,
+                                   (Bitmap*) &u0043_bitmap };
+    int line_4_length = 15;
+    Bitmap *line_4_bitmaps[15] = { (Bitmap*) &u004d_bitmap,
                                    (Bitmap*) &u006f_bitmap,
                                    (Bitmap*) &u0079_bitmap,
                                    (Bitmap*) &u0065_bitmap,
                                    (Bitmap*) &u006e_bitmap,
                                    (Bitmap*) &u006e_bitmap,
                                    (Bitmap*) &u0065_bitmap,
-                                   (Bitmap*) &u0020_bitmap,
-                                   (Bitmap*) &u003a_bitmap,
-                                   (Bitmap*) &u0020_bitmap, get_digit_bitmap(
+                                   (Bitmap*) &u003a_bitmap, get_digit_bitmap(
                                            mean_temperature, 1),
                                    get_digit_bitmap(mean_temperature, 0),
                                    (Bitmap*) &u002e_bitmap, get_digit_bitmap(
                                            mean_temperature, -1),
                                    get_digit_bitmap(mean_temperature, -2),
-                                   (Bitmap*) &u2103_bitmap };
+                                   (Bitmap*) &u00b0_bitmap,
+                                   (Bitmap*) &u0043_bitmap };
 
     draw_buffer_screen_bitmap(screen_controller, 0, 0,
                               (Bitmap*) &background_bitmap);
 
-    draw_buffer_screen_bitmaps_on_row(screen_controller, 2, 2, line_1_bitmaps,
-                                      line_1_length);
+    draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + 0 * GLYPH_HEIGHT,
+                                      2, line_1_bitmaps, line_1_length);
 
-    draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + GLYPH_HEIGHT, 2,
-                                      line_2_bitmaps, line_2_length);
+    draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + 1 * GLYPH_HEIGHT,
+                                      2, line_2_bitmaps, line_2_length);
 
     draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + 2 * GLYPH_HEIGHT,
                                       2, line_3_bitmaps, line_3_length);
@@ -152,33 +142,23 @@ void draw_welcome_page(ScreenController *screen_controller)
                                   (Bitmap*) &u0075_bitmap,
                                   (Bitmap*) &u0072_bitmap,
                                   (Bitmap*) &u002c_bitmap };
-    int guide_line_1_length = 24;
-    Bitmap *guide_line_1_bitmaps[24] = { (Bitmap*) &u0055_bitmap,
-                                         (Bitmap*) &u0074_bitmap,
-                                         (Bitmap*) &u0069_bitmap,
-                                         (Bitmap*) &u006c_bitmap,
-                                         (Bitmap*) &u0069_bitmap,
-                                         (Bitmap*) &u0073_bitmap,
-                                         (Bitmap*) &u0065_bitmap,
-                                         (Bitmap*) &u007a_bitmap,
-                                         (Bitmap*) &u0020_bitmap,
-                                         (Bitmap*) &u006c_bitmap,
-                                         (Bitmap*) &u0065_bitmap,
-                                         (Bitmap*) &u0020_bitmap,
-                                         (Bitmap*) &u0062_bitmap,
-                                         (Bitmap*) &u006f_bitmap,
-                                         (Bitmap*) &u0075_bitmap,
-                                         (Bitmap*) &u0074_bitmap,
-                                         (Bitmap*) &u006f_bitmap,
-                                         (Bitmap*) &u006e_bitmap,
-                                         (Bitmap*) &u0020_bitmap,
-                                         (Bitmap*) &u0052_bitmap,
-                                         (Bitmap*) &u0049_bitmap,
-                                         (Bitmap*) &u0047_bitmap,
-                                         (Bitmap*) &u0048_bitmap,
-                                         (Bitmap*) &u0054_bitmap };
-    int line_2_length = 12;
-    Bitmap *line_2_bitmaps[12] = { (Bitmap*) &u0070_bitmap,
+    int line_2_length = 14;
+    Bitmap *line_2_bitmaps[14] = { (Bitmap*) &u0075_bitmap,
+                                   (Bitmap*) &u0074_bitmap,
+                                   (Bitmap*) &u0069_bitmap,
+                                   (Bitmap*) &u006c_bitmap,
+                                   (Bitmap*) &u0069_bitmap,
+                                   (Bitmap*) &u0073_bitmap,
+                                   (Bitmap*) &u0065_bitmap,
+                                   (Bitmap*) &u007a_bitmap,
+                                   (Bitmap*) &u0020_bitmap,
+                                   (Bitmap*) &u0052_bitmap,
+                                   (Bitmap*) &u0049_bitmap,
+                                   (Bitmap*) &u0047_bitmap,
+                                   (Bitmap*) &u0048_bitmap,
+                                   (Bitmap*) &u0054_bitmap };
+    int line_3_length = 12;
+    Bitmap *line_3_bitmaps[12] = { (Bitmap*) &u0070_bitmap,
                                    (Bitmap*) &u006f_bitmap,
                                    (Bitmap*) &u0075_bitmap,
                                    (Bitmap*) &u0072_bitmap,
@@ -191,8 +171,8 @@ void draw_welcome_page(ScreenController *screen_controller)
                                    (Bitmap*) &u0065_bitmap,
                                    (Bitmap*) &u0072_bitmap };
 
-    int line_3_length = 15;
-    Bitmap *line_3_bitmaps[15] = { (Bitmap*) &u006c_bitmap,
+    int line_4_length = 15;
+    Bitmap *line_4_bitmaps[15] = { (Bitmap*) &u006c_bitmap,
                                    (Bitmap*) &u0061_bitmap,
                                    (Bitmap*) &u0020_bitmap,
                                    (Bitmap*) &u0074_bitmap,
@@ -211,17 +191,16 @@ void draw_welcome_page(ScreenController *screen_controller)
     draw_buffer_screen_bitmap(screen_controller, 0, 0,
                               (Bitmap*) &background_bitmap);
 
-    draw_buffer_screen_bitmaps_on_row(screen_controller, 2, 2, line_1_bitmaps,
-                                      line_1_length);
+    draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + 0 * GLYPH_HEIGHT,
+                                      2, line_1_bitmaps, line_1_length);
 
-    draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + GLYPH_HEIGHT, 2,
-                                      guide_line_1_bitmaps,
-                                      guide_line_1_length);
-
-    draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + 2 * GLYPH_HEIGHT,
+    draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + 1 * GLYPH_HEIGHT,
                                       2, line_2_bitmaps, line_2_length);
 
-    draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + 3 * GLYPH_HEIGHT,
+    draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + 2 * GLYPH_HEIGHT,
                                       2, line_3_bitmaps, line_3_length);
+
+    draw_buffer_screen_bitmaps_on_row(screen_controller, 2 + 3 * GLYPH_HEIGHT,
+                                      2, line_4_bitmaps, line_4_length);
 
 }

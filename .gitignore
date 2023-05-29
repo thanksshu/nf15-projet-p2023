@@ -41,7 +41,7 @@ makefile
 # Built Visual Studio Code Extensions
 *.vsix
 
-### VisualStudioCode Patch ###
+### Visual Studio Code Patch ###
 # Ignore all local history of files
 .history
 .ionide
@@ -54,5 +54,6 @@ __pycache__/
 
 ### User Defined ###
 .ccsproject
-*.bdf
+*.otf
 *.piskel
+.vscode

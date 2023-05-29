@@ -7,15 +7,16 @@ import json
 from base64 import b64decode
 from io import BytesIO
 from os import walk
-from pprint import pprint
 
 from PIL import Image
 
-PISKEL_DIR = "piskels"
+PISKEL_DIR = "image_bitmaps/piskels"
 
 names = []
 for filename in next(walk(PISKEL_DIR), (None, None, []))[2]:  # [] if no file
     """Read piskel file and extract useful infomation"""
+    if not filename.endswith(".piskel") :
+        continue
     with open(f"{PISKEL_DIR}/{filename}") as file:
         model_version, content = json.load(file).values()
 
@@ -67,7 +68,7 @@ const Bitmap {name}_bitmap = {{ .height = {height},
                                 .alpha = (Alpha*) {name}_alpha }};
 """
 
-    with open(f"{name}_bitmap.c", "w") as file:
+    with open(f"image_bitmaps/{name}_bitmap.c", "w") as file:
         file.write(c_file_content)
 
 """Generate ui_bitmaps.h"""
@@ -89,5 +90,5 @@ h_file_content = "".join(
     ]
 )
 
-with open(f"image_bitmaps.h", "w") as file:
+with open(f"image_bitmaps/image_bitmaps.h", "w") as file:
     file.write(h_file_content)
