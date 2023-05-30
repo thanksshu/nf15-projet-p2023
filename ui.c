@@ -1,11 +1,5 @@
 #include "includes.h"
 
-double get_temperature()
-{
-    _delay_cycles(1000); // Emulate I2C communication
-    return 36.66;
-}
-
 double max(double *temperatures, int length)
 {
     return 37.8;
@@ -44,7 +38,7 @@ void draw_result_page(ScreenController *screen_controller)
     double temperatures[SAMPLE_COUNT] = { 0 };
     for (index = 0; index < SAMPLE_COUNT; ++index)
     {
-        temperatures[index] = get_temperature();
+        temperatures[index] = get_ir_sensor_temperature();
     }
     double min_temperature = min(temperatures, SAMPLE_COUNT);
     double max_temperature = max(temperatures, SAMPLE_COUNT);

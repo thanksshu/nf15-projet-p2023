@@ -1,12 +1,7 @@
 #include "includes.h"
 
-
-
-void main(void)
+void init_button(void)
 {
-    // d�sactiver le Watchdog
-    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;
-
     // choix de la fonction GPIO pour le bouton P2.7(le bouton left)
     P2->SEL0 &= ~BIT7; // on met P2SEL0 � 0 pour P2.7
     P2->SEL1 &= ~BIT7; // on met P2SEL1 � 0 pour P2.7
@@ -22,8 +17,6 @@ void main(void)
     // choix de la fonction GPIO pour le bouton P7.4(le bouton valid)
     P7->SEL0 &= ~BIT4; // on met P7SEL0 � 0 pour P7.4
     P7->SEL1 &= ~BIT4; // on met P7SEL1 � 0 pour P7.4
-
-
 
     // reglage du bouton P2.7(le bouton left)
     P2->DIR &= ~BIT7;     //P2.7 entr�e
@@ -49,7 +42,6 @@ void main(void)
     P7->REN |= BIT4;      //R�sistance de pull autoris�e sur P7.4
     P7->OUT |= BIT4;      //Pull-up sur P7.4
 
-
     // relage de l'interruption pour le bouton P2.6(le bouton up) et bouton P2.7(le bouton left)
     P2->IES &= ~BIT6;      //l'interruption se produit sur un front montant
     P2->IE = BIT6;        //on autorise des interruptions uniquement sur P2.6
@@ -60,11 +52,8 @@ void main(void)
     P2->IFG = 0;          //on efface les drapeaux d'interruption sur P2
 
     NVIC_EnableIRQ(PORT2_IRQn); //autorisation NVIC pour le Port 2
-    __enable_irq();      //autorisation NVIC pour CPU
-
 
 }
-
 
 // fonction d'interruption (ISR) pour le port 2
 void PORT2_IRQHandler()
@@ -72,25 +61,14 @@ void PORT2_IRQHandler()
     if (P2->IFG & BIT6)
     {
 
-            P2->IFG &= ~BIT6; // on efface le drapeau d'interruption pour P2.6
+        P2->IFG &= ~BIT6; // on efface le drapeau d'interruption pour P2.6
 
     }
     if (P2->IFG & BIT7)
-      {
+    {
 
-              P2->IFG &= ~BIT7; // on efface le drapeau d'interruption pour P2.7
+        P2->IFG &= ~BIT7; // on efface le drapeau d'interruption pour P2.7
 
-      }
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
 

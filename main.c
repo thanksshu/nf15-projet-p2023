@@ -22,7 +22,7 @@ bool is_val_pressed()
 int main()
 {
     /*
-     * Hardware initialisation
+     * Initialisation
      */
     // Stop WatchDog
     MAP_WDT_A_holdTimer();
@@ -31,9 +31,9 @@ int main()
     CS_initClockSignal(CS_SMCLK, CS_MODOSC_SELECT, CS_CLOCK_DIVIDER_2);
     CS_initClockSignal(CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_2);
 
-    /*
-     * Software initialisation
-     */
+    // I2C
+    init_ir_temperature_sensor_communication();
+
     // Screen
     ScreenController screen_controller = new_screen_controller();
 
@@ -41,16 +41,19 @@ int main()
     enum page current_page;
     current_page = Off;
 
+    // Interruption
+    __enable_irq();
+
     /*
      * Main loop
      */
     while (1)
     {
+        _delay_cycles(300000); // TODO: Remove test code
+
         // Turn on
         if (is_val_pressed() && current_page == Off)
         {
-            _delay_cycles(3000000); // TODO: Remove test code
-
             turn_physical_screen_on();
 
             // Enter welcome screen when powered on
@@ -63,8 +66,6 @@ int main()
         // From welcome to result
         if (is_right_pressed() && (current_page == Welcome))
         {
-            _delay_cycles(3000000); // TODO: Remove test code
-
             // Loading screen
             draw_buffer_screen_all(&screen_controller, CLEAR_SCREEN_COLOR);
             draw_buffer_screen_bitmap(&screen_controller, 0, 0,
@@ -83,8 +84,6 @@ int main()
         // From result to welcome
         if (is_left_pressed() && (current_page == Result))
         {
-            _delay_cycles(3000000); // TODO: Remove test code
-
             draw_buffer_screen_all(&screen_controller, CLEAR_SCREEN_COLOR);
             draw_welcome_page(&screen_controller);
             sync_screen(&screen_controller, false);
@@ -94,8 +93,6 @@ int main()
         // Turn off
         if (is_val_pressed() && current_page != Off)
         {
-            _delay_cycles(3000000); // TODO: Remove test code
-
             turn_physical_screen_off();
             current_page = Off;
         }

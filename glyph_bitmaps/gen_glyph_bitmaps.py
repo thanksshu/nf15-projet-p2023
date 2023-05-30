@@ -70,8 +70,7 @@ const Bitmap u{bitmap_name}_bitmap = {{ .width = {glyph_width}, .height  = {glyp
 
         h_file_content.append(
             f"""
-extern const Bitmap u{bitmap_name}_bitmap;
-"""
+extern const Bitmap u{bitmap_name}_bitmap;"""
         )
 
 # Generate .c file
