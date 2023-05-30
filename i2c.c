@@ -11,6 +11,8 @@ uint8_t I2C_ReStart;       // n閏閟sit� d'effectuer un restart
 void UCB1_I2CMaster_Init(uint8_t ClockSpeed, uint8_t SlaveAddress)
 {   SlaveAddress = 0x5A;                              // Slave address
     ClockSpeed = 0x001E;                              // 100KHz frequence
+
+
     EUSCI_B1->CTLW0 |= EUSCI_B_CTLW0_SWRST;           // Software reset enabled
     EUSCI_B1->CTLW0 =   EUSCI_B_CTLW0_SWRST |         // Remain eUSCI in reset mode
                         EUSCI_B_CTLW0_MODE_3 |        // I2C mode
@@ -20,14 +22,17 @@ void UCB1_I2CMaster_Init(uint8_t ClockSpeed, uint8_t SlaveAddress)
     EUSCI_B1->CTLW1 = EUSCI_B_CTLW1_ASTP_0;           // No automatic stop generated
     EUSCI_B1->BRW = ClockSpeed;                       // baudrate = SMCLK / 30 = 400kHz@12MHz 120 100khz
     EUSCI_B1->I2CSA = SlaveAddress;                   // 7 bits slave address
-	P6->SEL0 |= BIT4 | BIT5;    					  // Configure P6.4 P6.5 Function for I2C
+	P6->SEL0 |= BIT4 | BIT5;    					  // Configure P6.4 et  P6.5 Function for I2C
     EUSCI_B1->CTLW0 &= ~EUSCI_B_CTLW0_SWRST;          // Release eUSCI from reset
 
 
     EUSCI_B1->IFG &= ~(EUSCI_B_IFG_RXIFG0|EUSCI_B_IFG_TXIFG0|EUSCI_B_IFG_NACKIFG|EUSCI_B_IFG_STPIFG );
     EUSCI_B1->IE |=  EUSCI_B_IE_RXIE|EUSCI_B_IE_TXIE0|EUSCI_B_IE_NACKIE|EUSCI_B_IE_STPIE;
 
+
     NVIC_EnableIRQ(EUSCIB1_IRQn);
+
+
 }
 
 // indique si un NACK a 閠� re鐄
@@ -54,11 +59,13 @@ uint8_t UCB1_I2CMaster_ReadBytes(uint8_t Count)
     RX_Pos = TX_Pos = 0;                              // remise � z閞o des compteurs d'octets
 	I2C_ReStart = 0;                                  // pas de restart
 
-    while ((EUSCI_B1->STATW&EUSCI_B_STATW_BBUSY));    // V閞ification que le bus est disponible
+
+    while ((EUSCI_B1->STATW & EUSCI_B_STATW_BBUSY));    // V閞ification que le bus est disponible
 
     EUSCI_B1->IFG &= ~(EUSCI_B_IFG_RXIFG0 | EUSCI_B_IFG_TXIFG0 );
     EUSCI_B1->CTLW0 &= ~(EUSCI_B_CTLW0_TR);           // Passage du maitre en r閏epteur
     EUSCI_B1->CTLW0 |= (EUSCI_B_CTLW0_TXSTT);         // Lancement de la communication
+
 
     if(RX_Nb == 1)                                    // Si un seul bit doit 阾re lu
     {
@@ -178,3 +185,5 @@ void EUSCIB1_IRQHandler(void)
         I2C_Drapeau_STOP = 1;                         // on indique la fin de communication
     }
 }
+
+
