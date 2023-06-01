@@ -9,10 +9,7 @@ bool is_right_pressed()
     return true;
 }
 
-bool is_left_pressed()
-{
-    return true;
-}
+
 
 bool is_val_pressed()
 {
@@ -49,7 +46,7 @@ int main()
      */
     while (1)
     {
-        _delay_cycles(300000); // TODO: Remove test code
+       // _delay_cycles(300000); // TODO: Remove test code
 
         // Turn on
         if (is_val_pressed() && current_page == Off)

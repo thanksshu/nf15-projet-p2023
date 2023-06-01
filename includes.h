@@ -27,5 +27,6 @@
 #include "image_bitmaps/image_bitmaps.h"
 #include "glyph_bitmaps/glyph_bitmaps.h"
 #include "ui.h"
+#include "button.h"
 
 #endif /* INCLUDES_H_ */

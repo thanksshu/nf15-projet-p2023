@@ -1,5 +1,17 @@
 #include "includes.h"
 
+
+bool is_button_left_pressed_before = false;
+bool is_button_left_pressed_now;
+
+
+bool is_button_right_pressed_before = false;
+bool is_button_right_pressed_now;
+
+
+bool is_button_val_pressed_before = false;
+bool is_button_val_pressed_now;
+
 void init_button(void)
 {
     // choix de la fonction GPIO pour le bouton P2.7(le bouton left)
@@ -67,8 +79,28 @@ void PORT2_IRQHandler()
     if (P2->IFG & BIT7)
     {
 
-        P2->IFG &= ~BIT7; // on efface le drapeau d'interruption pour P2.7
+        P2->IFG &= ~BIT7; // on efface le drapeau d'interruption pour P2.7(bouton left)
 
     }
+}
+//when user pressed the button, we have to know the user had down the opration
+//now we shoulde know the button left(P2.7) right(P10.5) and valide(P7.4) are pressed (active at niveau low)
+
+bool is_left_pressed()
+{
+    bool result = false;
+    bool is_button_left_pressed = !((bool) (P2->IN & BIT7));
+    if (is_button_left_pressed_before == false && is_button_left_pressed_now == true)
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+
+    is_button_left_pressed_before = is_button_left_pressed_now;
+
+    return result;
 }
 
