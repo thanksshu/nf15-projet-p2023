@@ -1,19 +1,6 @@
 #include "includes.h"
 
-double max(double *temperatures, int length)
-{
-    return 37.8;
-}
 
-double min(double *temperatures, int length)
-{
-    return 22.6;
-}
-
-double mean(double *temperatures, int length)
-{
-    return 35.4;
-}
 
 Bitmap *number_to_bitmap[10] = { (Bitmap*) &u0030_bitmap,
                                  (Bitmap*) &u0031_bitmap,
