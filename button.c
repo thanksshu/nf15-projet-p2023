@@ -1,16 +1,8 @@
 #include "includes.h"
 
-
-bool is_button_left_pressed_before = false;
-bool is_button_left_pressed_now;
-
-
-bool is_button_right_pressed_before = false;
-bool is_button_right_pressed_now;
-
-
-bool is_button_val_pressed_before = false;
-bool is_button_val_pressed_now;
+bool is_left_pressed_before = false;
+bool is_right_pressed_before = false;
+bool is_val_pressed_before = false;
 
 void init_button(void)
 {
@@ -53,44 +45,13 @@ void init_button(void)
     P7->DIR &= ~BIT4;     //P7.4 entr�e
     P7->REN |= BIT4;      //R�sistance de pull autoris�e sur P7.4
     P7->OUT |= BIT4;      //Pull-up sur P7.4
-
-    // relage de l'interruption pour le bouton P2.6(le bouton up) et bouton P2.7(le bouton left)
-    P2->IES &= ~BIT6;      //l'interruption se produit sur un front montant
-    P2->IE = BIT6;        //on autorise des interruptions uniquement sur P2.6
-    P2->IFG = 0;          //on efface les drapeaux d'interruption sur P2
-
-    P2->IES &= ~BIT7;      //l'interruption se produit sur un front montant
-    P2->IE = BIT7;        //on autorise des interruptions uniquement sur P2.7
-    P2->IFG = 0;          //on efface les drapeaux d'interruption sur P2
-
-    NVIC_EnableIRQ(PORT2_IRQn); //autorisation NVIC pour le Port 2
-
 }
-
-// fonction d'interruption (ISR) pour le port 2
-void PORT2_IRQHandler()
-{
-    if (P2->IFG & BIT6)
-    {
-
-        P2->IFG &= ~BIT6; // on efface le drapeau d'interruption pour P2.6
-
-    }
-    if (P2->IFG & BIT7)
-    {
-
-        P2->IFG &= ~BIT7; // on efface le drapeau d'interruption pour P2.7(bouton left)
-
-    }
-}
-//when user pressed the button, we have to know the user had down the opration
-//now we shoulde know the button left(P2.7) right(P10.5) and valide(P7.4) are pressed (active at niveau low)
 
 bool is_left_pressed()
 {
     bool result = false;
-    bool is_button_left_pressed = !((bool) (P2->IN & BIT7));
-    if (is_button_left_pressed_before == false && is_button_left_pressed_now == true)
+    bool now = !((bool) (P2->IN & BIT7 ));
+    if (is_left_pressed_before == false && now == true)
     {
         result = true;
     }
@@ -99,7 +60,43 @@ bool is_left_pressed()
         result = false;
     }
 
-    is_button_left_pressed_before = is_button_left_pressed_now;
+    is_left_pressed_before = now;
+
+    return result;
+}
+
+bool is_right_pressed()
+{
+    bool result = false;
+    bool now = !((bool) (P10->IN & BIT5 ));
+    if (is_right_pressed_before == false && now == true)
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+
+    is_right_pressed_before = now;
+
+    return result;
+}
+
+bool is_val_pressed()
+{
+    bool result = false;
+    bool now = !((bool) (P7->IN & BIT4 ));
+    if (is_val_pressed_before == false && now == true)
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+
+    is_val_pressed_before = now;
 
     return result;
 }
