@@ -4,18 +4,6 @@
 
 #include "includes.h"
 
-bool is_right_pressed()
-{
-    return true;
-}
-
-
-
-bool is_val_pressed()
-{
-    return true;
-}
-
 int main()
 {
     /*
@@ -27,6 +15,9 @@ int main()
     // Set SMCLK at 12MHz and MCLK at 1.5MHz
     CS_initClockSignal(CS_SMCLK, CS_MODOSC_SELECT, CS_CLOCK_DIVIDER_2);
     CS_initClockSignal(CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_2);
+
+    // Button
+    init_button();
 
     // I2C
     init_ir_temperature_sensor_communication();
@@ -46,22 +37,19 @@ int main()
      */
     while (1)
     {
-       // _delay_cycles(300000); // TODO: Remove test code
-
         // Turn on
-        if (is_val_pressed() && current_page == Off)
+        if ((current_page == Off) && is_val_pressed())
         {
-            turn_physical_screen_on();
-
             // Enter welcome screen when powered on
             draw_buffer_screen_all(&screen_controller, CLEAR_SCREEN_COLOR);
             draw_welcome_page(&screen_controller);
             sync_screen(&screen_controller, false);
+            turn_physical_screen_on();
             current_page = Welcome;
         }
 
         // From welcome to result
-        if (is_right_pressed() && (current_page == Welcome))
+        if ((current_page == Welcome) && is_right_pressed())
         {
             // Loading screen
             draw_buffer_screen_all(&screen_controller, CLEAR_SCREEN_COLOR);
@@ -79,7 +67,7 @@ int main()
         }
 
         // From result to welcome
-        if (is_left_pressed() && (current_page == Result))
+        if ((current_page == Result) && is_left_pressed())
         {
             draw_buffer_screen_all(&screen_controller, CLEAR_SCREEN_COLOR);
             draw_welcome_page(&screen_controller);
@@ -88,7 +76,7 @@ int main()
         }
 
         // Turn off
-        if (is_val_pressed() && current_page != Off)
+        if (current_page != Off && is_val_pressed())
         {
             turn_physical_screen_off();
             current_page = Off;
