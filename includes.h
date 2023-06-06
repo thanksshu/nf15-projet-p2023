@@ -28,5 +28,6 @@
 #include "glyph_bitmaps/glyph_bitmaps.h"
 #include "ui.h"
 #include "button.h"
+#include "min_max_mean.h"
 
 #endif /* INCLUDES_H_ */
