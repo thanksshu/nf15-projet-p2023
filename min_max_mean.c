@@ -6,16 +6,14 @@ double min(int length, double *temperatures)
 
     temperature_min = *temperatures;
 
-    // get the min temperature
-
-    for (i = 1; i < length; ++i)
+    for (i = 1; i < length; ++i)    // get the min temperature
     {
         if (*(temperatures + i) < temperature_min)
         {
             temperature_min = *(temperatures + i);
         }
     }
-    return temperature_min;
+    return temperature_min; // return the value of the min temperature
 }
 
 double max(int length, double *temperatures)
@@ -25,16 +23,14 @@ double max(int length, double *temperatures)
 
     temperature_max = *temperatures;
 
-    // get the max temperature
-
-    for (i = 1; i < length; ++i)
+    for (i = 1; i < length; ++i)     // get the max temperature
     {
         if (*(temperatures + i) > temperature_max)
         {
             temperature_max = *(temperatures + i);
         }
     }
-    return temperature_max;
+    return temperature_max; //return the value of the max temperature
 }
 
 double mean(int length, double *temperatures)
@@ -43,14 +39,11 @@ double mean(int length, double *temperatures)
     double temperature_mean;
     double temperature_sum = 0;
 
-    // get the mean temperature
-
-    for (i = 0; i < length; ++i)
+    for (i = 0; i < length; ++i)    // get the mean temperature
     {
         temperature_sum = temperature_sum + *(temperatures + i);
-        temperature_mean = temperature_sum / length;
+        temperature_mean = temperature_sum / length; // calculate the value of the mean temperature
     }
-    return temperature_mean;
+    return temperature_mean; // get the value of the mean temperature
 }
-
 
