@@ -32,6 +32,13 @@ int main()
     // Interruption
     __enable_irq();
 
+    // Set the emissivity of the IR sensor
+    // printf("read: %f\n", get_ir_sensor_emissivity());
+    // printf("write: %d\n", set_ir_sensor_emissivity(0.97));
+    // printf("read: %f\n", get_ir_sensor_emissivity());
+    // printf("write: %d\n", set_ir_sensor_emissivity(0.97));
+    // printf("read: %f\n", get_ir_sensor_emissivity());
+
     /*
      * Main loop
      */

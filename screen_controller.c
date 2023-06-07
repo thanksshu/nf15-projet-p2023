@@ -37,9 +37,9 @@ void draw_buffer_screen_bitmap(ScreenController *screen_controller, int x,
 {
     Alpha alpha = false;
     Color color = false;
-    int pixel_index = 0;
-    int pixel_x = 0;
-    int pixel_y = 0;
+    size_t pixel_index = 0;
+    size_t pixel_x = 0;
+    size_t pixel_y = 0;
     for (pixel_x = 0; pixel_x < bitmap->height; ++pixel_x)
     {
         for (pixel_y = 0; pixel_y < bitmap->width; ++pixel_y)
@@ -60,9 +60,9 @@ void draw_buffer_screen_bitmaps_on_row(ScreenController *screen_controller,
                                        int x, int y, Bitmap **bitmaps,
                                        int length)
 {
-    int index = 0;
-    int current_x = x;
-    int current_y = y;
+    size_t index = 0;
+    size_t current_x = x;
+    size_t current_y = y;
     for (index = 0; index < length; ++index)
     {
         draw_buffer_screen_bitmap(screen_controller, current_x, current_y,
@@ -73,8 +73,8 @@ void draw_buffer_screen_bitmaps_on_row(ScreenController *screen_controller,
 
 void draw_buffer_screen_all(ScreenController *screen_controller, Color color)
 {
-    int x = 0;
-    int y = 0;
+    size_t x = 0;
+    size_t y = 0;
     for (x = 0; x < SCREEN_HEIGHT; ++x)
     {
         for (y = 0; y < SCREEN_WIDTH; ++y)
@@ -87,8 +87,8 @@ void draw_buffer_screen_all(ScreenController *screen_controller, Color color)
 void sync_screen(ScreenController *screen_controller, bool force_sync)
 {
     // Sync screen content
-    int page = 0;
-    int column = 0;
+    size_t page = 0;
+    size_t column = 0;
     for (page = 0; page < PAGE_COUNT; ++page)
     {
         for (column = 0; column < SCREEN_WIDTH; ++column)

@@ -15,6 +15,7 @@
 #define PAGE_HEIGHT 8 // MUST be exactly divisible by the SCREEN_HEIGHT
 #define CLEAR_SCREEN_COLOR 1
 #define SAMPLE_COUNT 30 // Temperature sampling count
+#define IR_SENSOR_ADDR 0x5A
 
 // Glyph height is provided by the font, (here we've modified this value to fit the screen)
 #define GLYPH_HEIGHT 12
