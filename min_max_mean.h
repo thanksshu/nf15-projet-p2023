@@ -1,5 +1,5 @@
 /*
- * Function for get the valeur min max mean of the  temperature
+ * Function for get the minimum max mean value of the  temperature
  */
 
 #ifndef MIN_MAX_MEAN_H_
