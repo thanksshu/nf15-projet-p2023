@@ -1,7 +1,7 @@
 #include "includes.h"
 double min(int length, double *temperatures)
 {
-    int i; // compter the number
+    size_t i; // compter the number
     double temperature_min;
 
     temperature_min = *temperatures;
@@ -18,7 +18,7 @@ double min(int length, double *temperatures)
 
 double max(int length, double *temperatures)
 {
-    int i; // compter the number
+    size_t i; // compter the number
     double temperature_max;
 
     temperature_max = *temperatures;
@@ -35,7 +35,7 @@ double max(int length, double *temperatures)
 
 double mean(int length, double *temperatures)
 {
-    int i; // compter the number
+    size_t i; // compter the number
     double temperature_mean;
     double temperature_sum = 0;
 

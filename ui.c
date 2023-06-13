@@ -1,7 +1,5 @@
 #include "includes.h"
 
-
-
 Bitmap *number_to_bitmap[10] = { (Bitmap*) &u0030_bitmap,
                                  (Bitmap*) &u0031_bitmap,
                                  (Bitmap*) &u0032_bitmap,
@@ -21,15 +19,15 @@ Bitmap* get_digit_bitmap(double number, int digit)
 void draw_result_page(ScreenController *screen_controller)
 {
 
-    int index = 0;
+    size_t index = 0;
     double temperatures[SAMPLE_COUNT] = { 0 };
     for (index = 0; index < SAMPLE_COUNT; ++index)
     {
         temperatures[index] = get_ir_sensor_temperature();
     }
-    double min_temperature = min(temperatures, SAMPLE_COUNT);
-    double max_temperature = max(temperatures, SAMPLE_COUNT);
-    double mean_temperature = mean(temperatures, SAMPLE_COUNT);
+    double min_temperature = min(SAMPLE_COUNT, temperatures);
+    double max_temperature = max(SAMPLE_COUNT, temperatures);
+    double mean_temperature = mean(SAMPLE_COUNT, temperatures);
 
     int line_1_length = 11;
     Bitmap *line_1_bitmaps[11] = { (Bitmap*) &u0054_bitmap,

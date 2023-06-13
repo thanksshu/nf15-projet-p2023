@@ -16,7 +16,6 @@ void command_physical_screen(uint8_t data, bool data_mode)
 void init_physical_screen_communication(void)
 {
     /* Initialise UCA1 as SPI for the screen */
-    P2->SEL0 |= BIT0 | BIT1 | BIT2 | BIT3; // Use UCA1 with P2.0, P2.1, P2.2, P2.3
 
     EUSCI_A1->CTLW0 |= EUSCI_A_CTLW0_SWRST; // Enter reset mode (start register configuration)
 
@@ -24,12 +23,9 @@ void init_physical_screen_communication(void)
             EUSCI_A_CTLW0_SYNC | // Synchrony mode
             EUSCI_A_CTLW0_MST | // Master Mode
             EUSCI_A_CTLW0_MODE_1 | // 4 pin SPI, CS active when high
-            EUSCI_A_CTLW0_CKPL | // Polarity = 1
-            // Phase = 1, but We don't use this value provided in the doc,
-            // cause phase 0 works much better
-            // EUSCI_A_CTLW0_CKPH |
+            EUSCI_A_CTLW0_CKPL | // Polarity = 1, phase = 1 => CKPH = 0
             EUSCI_A_CTLW0_MSB); // Send MSB first
-
+    P2->SEL0 |= BIT0 | BIT1 | BIT2 | BIT3; // Use UCA1 with P2.0, P2.1, P2.2, P2.3
     EUSCI_A1->CTLW0 &= ~EUSCI_A_CTLW0_SWRST; // Quit reset mode (end register configuration)
 
     // Start interruption
@@ -45,11 +41,11 @@ void init_physical_screen_communication(void)
     P2->SEL0 &= ~BIT4;
     P2->SEL1 &= ~BIT4;
     P2->DIR |= BIT4;
-    P2->OUT |= BIT4; // Initialise reset
+    P2->OUT |= BIT4; // Initialise screen reset
     _delay_cycles(75000);
-    P2->OUT &= ~BIT4; // Enter reset mode
+    P2->OUT &= ~BIT4; // Enter screen reset mode
     _delay_cycles(75000);
-    P2->OUT |= BIT4; // Quit reset mode
+    P2->OUT |= BIT4; // Quit screen reset mode
 }
 
 void init_physical_screen_display()

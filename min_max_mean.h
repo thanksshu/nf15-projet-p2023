@@ -7,8 +7,8 @@
 
 #include "includes.h"
 
-double min(int length, double *temperature);
-double max(int length, double *temperature);
-double mean(int length, double *temperature);
+double min(int length, double *temperatures);
+double max(int length, double *temperatures);
+double mean(int length, double *temperatures);
 
-#endif MIN_MAX_MEAN_H_ /* MIN_MAX_MEAN_H_ */
+#endif /* MIN_MAX_MEAN_H_ */
